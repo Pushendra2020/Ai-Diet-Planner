@@ -38,8 +38,11 @@ const Navbar = () => {
           </div>
           {/* Auth Buttons */}
           <div className="hidden md:flex space-x-4">
-            <button className="px-4 py-2 rounded bg-green-500 text-white hover:bg-green-600 transition">Log In</button>
-            <button className="px-4 py-2 rounded border border-green-500 text-green-600 hover:bg-green-50 transition">Sign In</button>
+            <Link to="/login" className="px-4 py-2 rounded bg-green-500 text-white hover:bg-green-600 transition">Log In</Link>
+            <Link className="px-4 py-2 rounded border border-green-500 text-green-600
+             hover:bg-green-50 transition"
+             to='/createAcc'
+             >Sign In</Link>
           </div>
           {/* Mobile menu button */}
           <div className="md:hidden flex items-center">
@@ -134,8 +137,14 @@ const Navbar = () => {
               Calculate TDEE
             </NavLink>
             <div className="border-t border-gray-200 my-2"></div>
-            <button className="w-full mt-2 px-4 py-2 rounded bg-green-500 text-white hover:bg-green-600 transition">Log In</button>
-            <button className="w-full mt-2 px-4 py-2 rounded border border-green-500 text-green-600 hover:bg-green-50 transition">Sign In</button>
+            <Link to="/login" className="w-full mt-2 px-4 py-2 rounded bg-green-500 text-white hover:bg-green-600 transition">Log In</Link>
+            <Link
+              to="/createAcc"
+              className="w-full mt-2 px-4 py-2 rounded border border-green-500 text-green-600 hover:bg-green-50 transition text-center block"
+              
+            >
+              Sign In
+            </Link>
           </div>
         </div>
       )}

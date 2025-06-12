@@ -53,11 +53,11 @@ const userSchema = new Schema(
     dietPreferences: {
       type: String,
       require: true,
-      enum: ["vegetarian", "Non-vegetarian", "Vegon"],
+      enum: ["Vegetarian", "Non-vegetarian", "Vegon"],
     },
+    
     allergies: [String],
-  },
-  {
+
     refreshToken:{
       type:String
     }
