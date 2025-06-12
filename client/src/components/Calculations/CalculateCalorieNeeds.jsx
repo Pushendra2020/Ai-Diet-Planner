@@ -17,7 +17,7 @@ const CalculateCalorieNeeds = () => {
 
   return (
     <>
-      <div>
+      <div className="container mx-auto px-4 py-8">
         <h1 className="text-3xl font-bold text-center mt-10">Calculate Your Calorie Needs</h1>
         <form className="max-w-md w-full mx-auto mt-8" onSubmit={handleForm}>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -32,11 +32,13 @@ const CalculateCalorieNeeds = () => {
                 onChange={(e) => setTedd(e.target.value)}
                 name="tedd"
                 placeholder="Enter your TEDD in kilocalories"
-                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                className="shadow appearance-none border rounded w-96 py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                 required
               />
             </div>
+
           </div>
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="mb-4">
               <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="activityLevel">
@@ -46,14 +48,16 @@ const CalculateCalorieNeeds = () => {
                 id="activityLevel"
                 name="activityLevel"
                 onChange={(e) => setGoal(e.target.value)}
-                className="shadow border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                className="shadow border rounded w-96 py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                 required
               >
                 <option value="gain">Gain (Gaining Your Weight)</option>
                 <option value="maintain">Maintain (Maintain Yous current Weight)</option>
                 <option value="lose">Lose (Losing Your Weight)</option>
               </select>
+
             </div>
+
           </div>
 
           <button

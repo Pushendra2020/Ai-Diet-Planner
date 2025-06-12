@@ -18,7 +18,7 @@ const CalculateBMR = () => {
 
   return (
     <>
-      <div>
+      <div className="container mx-auto px-4 py-8">
         <h1 className="text-3xl font-bold text-center mt-10">Calculate Your BMR</h1>
         <form className="max-w-md mx-auto mt-8" onSubmit={handleForm}>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

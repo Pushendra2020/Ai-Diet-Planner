@@ -1,11 +1,9 @@
-import  {ApiError}  from "../utils/ApiError.js";
-import ApiResponse  from "../utils/ApiResponse.js";
-import {asyncHandler} from "../utils/asyncHandler.js";
+import { ApiError } from "../utils/ApiError.js";
+import ApiResponse from "../utils/ApiResponse.js";
+import { asyncHandler } from "../utils/asyncHandler.js";
 import { User } from "../models/user.model.js";
 import jwt from "jsonwebtoken";
 import { calculateAndSaveHealth } from "../utils/calculateAndSaveHealth.js";
-
-
 
 const generateAccessAndRefreshToken = async (userId) => {
   try {
@@ -19,8 +17,6 @@ const generateAccessAndRefreshToken = async (userId) => {
     throw new ApiError(500, "Enable to genrate Token");
   }
 };
-
-
 
 const userRegister = asyncHandler(async (req, res) => {
   //First get a data from the frontend
@@ -66,10 +62,9 @@ const userRegister = asyncHandler(async (req, res) => {
   if (userExist) {
     throw new ApiError(401, "user is already exist");
   }
-  
 
-const user = await User.create({
-    username:username.toLowerCase(),
+  const user = await User.create({
+    username: username.toLowerCase(),
     email,
     password,
     age,
@@ -79,18 +74,18 @@ const user = await User.create({
     weight,
     activityLevel,
     dietPreferences,
-    allergies
-})
+    allergies,
+  });
 
-const userCreated = await User.findById(user._id).select(
+  const userCreated = await User.findById(user._id).select(
     "-password -refreshToken"
-)
+  );
 
-if(!userCreated){
-    throw new ApiError(500,"Faield to store user to data base")
-}
+  if (!userCreated) {
+    throw new ApiError(500, "Faield to store user to data base");
+  }
 
-const healthData = await calculateAndSaveHealth({
+  const healthData = await calculateAndSaveHealth({
     userId: user._id,
     age,
     gender,
@@ -100,13 +95,16 @@ const healthData = await calculateAndSaveHealth({
     goal,
   });
 
-
-return res
-.status(200)
-.json(new ApiResponse(200, { user: userCreated, health:healthData }, "User created Successfully"));
-
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(
+        200,
+        { user: userCreated, health: healthData },
+        "User created Successfully"
+      )
+    );
 });
-
 
 const userLogin = asyncHandler(async (req, res) => {
   //First take emai,password from frontend
@@ -121,19 +119,21 @@ const userLogin = asyncHandler(async (req, res) => {
     throw new ApiError(400, "All fields are require");
   }
   const user = await User.findOne({ email });
-  console.log(user._id)
+  console.log(user._id);
   console.log(user);
   if (!user) {
     throw new ApiError(400, "User is not Exist");
   }
 
   const isPasswordValide = await user.isPasswordCorrect(password);
-console.log(password)
+  console.log(password);
   if (!isPasswordValide) {
     throw new ApiError(401, "Password is incorrect");
   }
 
-  const { accessToken, refreshToken } = await generateAccessAndRefreshToken(user._id);
+  const { accessToken, refreshToken } = await generateAccessAndRefreshToken(
+    user._id
+  );
 
   const loggedInUser = await User.findById(user._id).select(
     "-password -refreshToken"
@@ -160,7 +160,6 @@ console.log(password)
       )
     );
 });
-
 
 const userLogOut = asyncHandler(async (req, res) => {
   await User.findByIdAndUpdate(
@@ -199,26 +198,25 @@ const refereshAccessToken = asyncHandler(async (req, res) => {
       incommingRefereshToken,
       process.env.REFRESH_TOKEN_SECRET
     );
-  
+
     const user = await User.findById(decoded._id);
-  
+
     if (!user) {
       throw new ApiError(401, "Invalid Token");
     }
-  
+
     if (incommingRefereshToken !== user?.refereshToken) {
       throw new ApiError(401, "Referesh Token is expire or used");
     }
-  
+
     const options = {
       httpOnly: true,
       secure: true,
     };
-  
-    const { accessToken, newRefereshToken } = await generateAccessAndRefreshToken(
-      user._id
-    );
-  
+
+    const { accessToken, newRefereshToken } =
+      await generateAccessAndRefreshToken(user._id);
+
     return res
       .status(200)
       .cookie("accessToken", accessToken, options)
@@ -230,9 +228,79 @@ const refereshAccessToken = asyncHandler(async (req, res) => {
         })
       );
   } catch (error) {
-    throw new ApiError(400,"Invalide Refresh Token",error)
+    throw new ApiError(400, "Invalide Refresh Token", error);
   }
 });
 
+const changeCurrentPassword = asyncHandler(async (req, res) => {
+  const { oldPassword, newPassword } = req.body;
 
-export {userRegister,userLogin,userLogOut,refereshAccessToken}
+  const user = await User.findById(req.user?._id);
+  const isPasswordCorrect = await user.isPasswordCorrect(oldPassword);
+
+  if (!isPasswordCorrect) {
+    throw new ApiError(400, "The Entered password is incorrect");
+  }
+
+  user.password = newPassword;
+  await user.save({ validateBeforeSave: false });
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, {}, "Password change successfuly"));
+});
+
+const getCurrentUser = asyncHandler(async (req, res) => {
+  return res
+    .status(200)
+    .json(new ApiResponse(200, req.user, "User Data is fetched!!"));
+});
+
+const updateAccountDetails = asyncHandler(async (req, res) => {
+  const {
+    age,
+    gender,
+    hight,
+    weight,
+    activityLevel,
+    goal,
+    dietPreferences,
+    allergies,
+  } = req.body;
+
+  if (!fullname || !email) {
+    throw new ApiError(400, "All fields are require");
+  }
+
+  const user = User.findByIdAndUpdate(
+    req.user?._id,
+    {
+      $set: {
+        age,
+        gender,
+        hight,
+        weight,
+        activityLevel,
+        goal,
+        dietPreferences,
+        allergies,
+      },
+    },
+    {
+      new: true,
+    }
+  ).select("-password");
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, user, "Account Details are updated!!"));
+});
+
+export {
+  userRegister,
+  userLogin,
+  userLogOut,
+  refereshAccessToken,
+  getCurrentUser,
+  updateAccountDetails,
+};
