@@ -154,14 +154,22 @@ const Navbar = () => {
               Calculate TDEE
             </NavLink>
             <div className="border-t border-gray-200 my-2"></div>
-            <Link to="/login" className="w-full mt-2 px-4 py-2 rounded bg-green-500 text-white hover:bg-green-600 transition">Log In</Link>
-            <Link
-              to="/createAcc"
-              className="w-full mt-2 px-4 py-2 rounded border border-green-500 text-green-600 hover:bg-green-50 transition text-center block"
+             {!authStatus ? (
+              <>
+                <Link to="/login" className="px-4 py-2 rounded bg-green-500 text-white
+             hover:bg-green-600 transition"
+                >Log In</Link>
 
-            >
-              Sign In
-            </Link>
+                <Link className="px-4 py-2 rounded border border-green-500 text-green-600
+             hover:bg-green-50 transition"
+                  to='/createAcc'
+                >Sign In</Link>
+              </>
+            ) : (
+              <LogoutBnt />
+            )
+
+            }
           </div>
         </div>
       )}
