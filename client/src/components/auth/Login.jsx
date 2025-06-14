@@ -1,73 +1,29 @@
-// import React,{useState} from 'react'
-// import axios from 'axios'
-// import { NavLink } from 'react-router-dom'
-// const Login = () => {
-//     const [email, setEmail] = useState('')
-//     const [password, setPassword] = useState('')
-
-//     const handleSubmit = async (e) => {
-//         e.preventDefault()
-//         try {
-//             const response = await axios.post('http://localhost:5000/api/v2/users/login', { email, password })
-//             console.log(response.data)
-//         } catch (error) {
-//             console.error(error)
-//         }
-//     }
-
-//     return (
-//         <div className='container mx-auto px-4 py-8 max-w-lg pt-20'>
-//             <h2>Login</h2>
-//             <form onSubmit={handleSubmit}>
-//                 <div>
-//                     <label>Email:</label>
-//                     <input
-//                         type="email"
-//                         onChange={(e) => setEmail(e.target.value)}
-//                         value={email}
-//                         required
-//                         placeholder='Enter your email'
-//                     />
-//                 </div>
-//                 <div>
-//                     <label>Password:</label>
-//                     <input
-//                         type="password"
-//                         onChange={(e) => setPassword(e.target.value)}
-//                         value={password}
-//                         required
-//                         placeholder='Enter your password'
-//                     />
-//                 </div>
-//                 <button>Login</button>
-//             </form>
-//             <p>
-//                 Don't have an account? <NavLink to="/register">Register</NavLink>
-//             </p>
-//         </div>
-//     )
-// }
-
-// export default Login
-
-
-
-
-
-
 import React, { useState } from 'react'
 import axios from 'axios'
-import { NavLink } from 'react-router-dom'
-
+import { NavLink, useNavigate } from 'react-router-dom'
+import { useDispatch } from 'react-redux'
+import { login } from '../../app/authSlice.js'
 const Login = () => {
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
+    const dispatch = useDispatch()
+    const navigate = useNavigate()
 
     const handleSubmit = async (e) => {
         e.preventDefault()
         try {
-            const response = await axios.post('http://localhost:5000/api/v2/users/login', { email, password })
+            const response = await axios.post('http://localhost:5000/api/v2/users/login', { email, password }, {
+                withCredentials: true,
+            })
             console.log(response.data)
+            if (response.data.success) {
+                const userData = response.data
+                console.log(response.data)
+                if (userData) {
+                    dispatch(login(userData));
+                }
+                navigate('/')
+            }
         } catch (error) {
             console.error(error)
         }

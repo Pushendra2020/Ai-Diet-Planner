@@ -1,10 +1,12 @@
 import React, { useState } from 'react'
 import { NavLink, Link, useNavigate } from 'react-router-dom'
-
+import { useSelector } from "react-redux"
+import LogoutBnt from './auth/LogoutBnt';
 
 const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const navigate = useNavigate();
+  const authStatus = useSelector((state) => state.auth.status);
   const handleSelect = (e) => {
     const value = e.target.value;
     if (value) navigate(value);
@@ -37,13 +39,28 @@ const Navbar = () => {
 
           </div>
           {/* Auth Buttons */}
+
           <div className="hidden md:flex space-x-4">
-            <Link to="/login" className="px-4 py-2 rounded bg-green-500 text-white hover:bg-green-600 transition">Log In</Link>
-            <Link className="px-4 py-2 rounded border border-green-500 text-green-600
+            {!authStatus ? (
+              <>
+                <Link to="/login" className="px-4 py-2 rounded bg-green-500 text-white
+             hover:bg-green-600 transition"
+                >Log In</Link>
+
+                <Link className="px-4 py-2 rounded border border-green-500 text-green-600
              hover:bg-green-50 transition"
-             to='/createAcc'
-             >Sign In</Link>
+                  to='/createAcc'
+                >Sign In</Link>
+              </>
+            ) : (
+              <LogoutBnt />
+            )
+
+            }
+
+
           </div>
+
           {/* Mobile menu button */}
           <div className="md:hidden flex items-center">
             <button
@@ -141,7 +158,7 @@ const Navbar = () => {
             <Link
               to="/createAcc"
               className="w-full mt-2 px-4 py-2 rounded border border-green-500 text-green-600 hover:bg-green-50 transition text-center block"
-              
+
             >
               Sign In
             </Link>

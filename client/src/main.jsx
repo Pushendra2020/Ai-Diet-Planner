@@ -1,8 +1,10 @@
-import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
-import App from './App.jsx'
-import { createBrowserRouter, createRoutesFromChildren, Route, RouterProvider } from 'react-router-dom'
+import { Provider } from 'react-redux'
+import { PersistGate } from 'redux-persist/integration/react'
+import { persistor } from './app/store.js'
+import {store} from './app/store.js'
+import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import Layout from './components/Layout.jsx'
 import Hero from './components/Hero.jsx'
 import CalculateBMI from './components/Calculations/CalculateBMI.jsx'
@@ -30,7 +32,9 @@ const router = createBrowserRouter([
 ])
 
 createRoot(document.getElementById('root')).render(
-  <StrictMode>
+   <Provider store={store}>
+     <PersistGate loading={null} persistor={persistor}>
     <RouterProvider router={router} />
-  </StrictMode>,
+    </PersistGate>
+  </Provider>,
 )
