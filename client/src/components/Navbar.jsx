@@ -36,12 +36,20 @@ const Navbar = () => {
               <option value="/calculateCalorieNeeds">Calculate Calorie Needs</option>
               <option value="/calculateTDEE">Calculate TDEE</option>
             </select>
-             {!authStatus ?(
-           <></>
-             ) : (
-              
-              <NavLink to='/profile'>Profile</NavLink>
-             )
+            {!authStatus ? (
+              <></>
+            ) : (
+              <>
+                <NavLink
+                  to='/profile'
+                  className="text-gray-700 hover:text-green-600 font-medium transition"
+                >Profile</NavLink>
+                <NavLink
+                  to='/plan'
+                  className="text-gray-700 hover:text-green-600 font-medium transition"
+                >Diet Plan</NavLink>
+              </>
+            )
             }
           </div>
           {/* Auth Buttons */}
@@ -118,6 +126,22 @@ const Navbar = () => {
             >
               About
             </NavLink>
+            {!authStatus ? (
+              <></>
+            ) : (
+              <>
+                <NavLink
+                  to='/profile'
+                  className="block px-3 py-2 rounded text-gray-700 font-medium transition hover:bg-green-100 hover:text-green-600"
+                >Profile</NavLink>
+                <NavLink
+                  to='/plan'
+                  className="block px-3 py-2 rounded text-gray-700 font-medium transition hover:bg-green-100 hover:text-green-600"
+                >Diet Plan</NavLink>
+              </>
+            )
+            }
+
             <div className="border-t border-gray-200 my-2"></div>
             <NavLink
               to="/calculateBMI"
