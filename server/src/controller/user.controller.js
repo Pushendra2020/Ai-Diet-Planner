@@ -2,6 +2,7 @@ import { ApiError } from "../utils/ApiError.js";
 import ApiResponse from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { User } from "../models/user.model.js";
+import {Health} from "../models/health.model.js"
 import jwt from "jsonwebtoken";
 import { calculateAndSaveHealth } from "../utils/calculateAndSaveHealth.js";
 
@@ -260,7 +261,7 @@ const updateAccountDetails = asyncHandler(async (req, res) => {
   const {
     age,
     gender,
-    hight,
+    height,
     weight,
     activityLevel,
     goal,
@@ -268,17 +269,17 @@ const updateAccountDetails = asyncHandler(async (req, res) => {
     allergies,
   } = req.body;
 
-  if (!fullname || !email) {
-    throw new ApiError(400, "All fields are require");
-  }
+  // if (!fullname || !email) {
+  //   throw new ApiError(400, "All fields are require");
+  // }
 
-  const user = User.findByIdAndUpdate(
+  const user =await User.findByIdAndUpdate(
     req.user?._id,
     {
       $set: {
         age,
         gender,
-        hight,
+        height,
         weight,
         activityLevel,
         goal,
@@ -289,12 +290,42 @@ const updateAccountDetails = asyncHandler(async (req, res) => {
     {
       new: true,
     }
-  ).select("-password");
+  ).select("-password -_id");
+
+  const healthData = await calculateAndSaveHealth({
+    userId: user._id,
+    age,
+    gender,
+    height,
+    weight,
+    activityLevel,
+    goal,
+  });
 
   return res
     .status(200)
-    .json(new ApiResponse(200, user, "Account Details are updated!!"));
+    .json(
+      new ApiResponse(
+        200,
+        { user: user, health: healthData },
+        "Account Details are updated!!"
+      )
+    );
 });
+
+const getHealthUser = asyncHandler(async(req,res)=>{
+  const userId=req.user?._id
+  const healthUser=await Health.find({userId})
+
+  return res.status(200).json(
+    new ApiResponse(
+      200,
+      {healthUser},
+      "Getting data of user Health"
+    )
+  )
+
+})
 
 export {
   userRegister,
@@ -302,5 +333,7 @@ export {
   userLogOut,
   refereshAccessToken,
   getCurrentUser,
+  changeCurrentPassword,
   updateAccountDetails,
+  getHealthUser
 };
