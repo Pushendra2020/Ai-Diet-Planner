@@ -13,6 +13,8 @@ import CalculateCalorieNeeds from './components/Calculations/CalculateCalorieNee
 import CalculateTDEE from './components/Calculations/CalculateTDEE.jsx'
 import CreateAcc from './components/auth/CreateAcc.jsx'
 import Login from './components/auth/Login.jsx'
+import Profile from './components/Profile.jsx'
+import EditProfile from './components/EditProfile.jsx'
 
 
 const router = createBrowserRouter([
@@ -21,6 +23,8 @@ const router = createBrowserRouter([
     element: <Layout />,
     children: [
       { path: '', element: <Hero /> },
+      {path:'/profile',element:<Profile/>},
+      {path:'/editprofile',element:<EditProfile/>},
       { path: 'calculateBMI', element: <CalculateBMI /> },
       { path: 'calculateBMR', element: <CalculateBMR /> },
       { path: 'calculateCalorieNeeds', element: <CalculateCalorieNeeds /> },

@@ -1,5 +1,6 @@
 import React from 'react'
 import '../index.css'
+import Profile from './Profile'
 
 const Hero = () => {
     return (

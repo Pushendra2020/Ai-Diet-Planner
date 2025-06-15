@@ -17,11 +17,11 @@ const Login = () => {
             })
             console.log(response.data)
             if (response.data.success) {
-                const userData = response.data
-                console.log(response.data)
-                if (userData) {
-                    dispatch(login(userData));
-                }
+                const user = response.data.data.loggedInUser
+                console.log(response.data.data.loggedInUser)
+
+                dispatch(login({ userData: user }));
+
                 navigate('/')
             }
         } catch (error) {

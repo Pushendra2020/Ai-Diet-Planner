@@ -36,7 +36,13 @@ const Navbar = () => {
               <option value="/calculateCalorieNeeds">Calculate Calorie Needs</option>
               <option value="/calculateTDEE">Calculate TDEE</option>
             </select>
-
+             {!authStatus ?(
+           <></>
+             ) : (
+              
+              <NavLink to='/profile'>Profile</NavLink>
+             )
+            }
           </div>
           {/* Auth Buttons */}
 
@@ -68,8 +74,8 @@ const Navbar = () => {
               className="text-gray-700 hover:text-green-600 focus:outline-none"
               aria-label="Toggle menu"
             >
-              <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              <svg className="h-6 w-6 text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
               </svg>
             </button>
           </div>
@@ -154,7 +160,7 @@ const Navbar = () => {
               Calculate TDEE
             </NavLink>
             <div className="border-t border-gray-200 my-2"></div>
-             {!authStatus ? (
+            {!authStatus ? (
               <>
                 <Link to="/login" className="px-4 py-2 rounded bg-green-500 text-white
              hover:bg-green-600 transition"
