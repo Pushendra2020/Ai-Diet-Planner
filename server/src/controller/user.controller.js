@@ -36,6 +36,8 @@ const userRegister = asyncHandler(async (req, res) => {
     goal,
     dietPreferences,
     allergies,
+    mealsPerDay,     
+    mealBudgets
   } = req.body;
 
   if (
@@ -50,6 +52,8 @@ const userRegister = asyncHandler(async (req, res) => {
       activityLevel,
       goal,
       dietPreferences,
+      mealsPerDay,     
+      mealBudgets
     ].some((field) => field?.trim === "")
   ) {
     throw new ApiError(400, "All Fields are require");
@@ -75,6 +79,8 @@ const userRegister = asyncHandler(async (req, res) => {
     activityLevel,
     dietPreferences,
     allergies,
+    mealsPerDay,     
+    mealBudgets
   });
 
   const userCreated = await User.findById(user._id).select(
@@ -266,6 +272,8 @@ const updateAccountDetails = asyncHandler(async (req, res) => {
     goal,
     dietPreferences,
     allergies,
+    mealsPerDay,     
+    mealBudgets
   } = req.body;
 
   // if (!fullname || !email) {
@@ -284,6 +292,8 @@ const updateAccountDetails = asyncHandler(async (req, res) => {
         goal,
         dietPreferences,
         allergies,
+        mealsPerDay,     
+        mealBudgets
       },
     },
     {

@@ -1,6 +1,6 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import axios from 'axios'
-import { NavLink,useNavigate } from 'react-router-dom'
+import { NavLink, useNavigate } from 'react-router-dom'
 
 const CreateAcc = () => {
     const [username, setUsername] = useState('');
@@ -14,19 +14,32 @@ const CreateAcc = () => {
     const [goal, setGoal] = useState('lose');
     const [dietPreferences, setDietPreferences] = useState('vegetarian');
     const [allergies, setAllergies] = useState([]);
+    const [currency, setCurrency] = useState('INR');
+    const [mealsPerDay, setMealsPerDay] = useState(3);
+    const [mealBudgets, setMealBudgets] = useState([0, 0, 0]);
+
     const navigate = useNavigate();
 
     const handleForm = async (e) => {
         e.preventDefault();
         await axios.post('http://localhost:5000/api/v2/users/register', {
-            username, email, password, age, gender, height, weight, activityLevel, goal, dietPreferences, allergies
-        }).then(function (response){
+            username, email, password, age, gender, height, weight, activityLevel, goal,
+            dietPreferences, allergies, mealsPerDay, mealBudgets, currency
+        }).then(function (response) {
             console.log(response)
             navigate('/login');
-        }).catch(function (error){
+        }).catch(function (error) {
             console.log(error)
         })
     }
+
+    useEffect(() => {
+        setMealBudgets((prev) => {
+            const arr = [...prev];
+            arr.length = mealsPerDay;
+            return arr.map((v, i) => arr[i] || 0);
+        });
+    }, [mealsPerDay]);
 
     return (
         <>
@@ -97,7 +110,7 @@ const CreateAcc = () => {
                             type="number"
                             value={height}
                             placeholder='Enter Height in CM'
-                            min={0}                         
+                            min={0}
                             onChange={(e) => setHeight(e.target.value)}
 
                             required
@@ -144,6 +157,59 @@ const CreateAcc = () => {
                             <option value="lose">Lose (Losing Your Weight)</option>
                         </select>
                     </div>
+
+                    <div>
+                        <label className="block text-gray-700 font-semibold mb-2">Meals Per Day:</label>
+                        <input
+                            type="number"
+                            min={1}
+                            max={10}
+                            value={mealsPerDay}
+                            onChange={e => setMealsPerDay(Number(e.target.value))}
+                            className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-400"
+                            required
+                        />
+                    </div>
+
+
+                    <div>
+                        <label className="block text-gray-700 font-semibold mb-2">Currency:</label>
+                        <select
+                            value={currency}
+                            onChange={e => setCurrency(e.target.value)}
+                            className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-400"
+                            required
+                        >
+                            <option value="INR">INR (₹)</option>
+                            <option value="USD">USD ($)</option>
+                        </select>
+                    </div>
+
+
+                    <div>
+                        <label className="block text-gray-700 font-semibold mb-2">
+                            Meal Budgets (per meal, in {currency === 'INR' ? '₹' : '$'}):
+                        </label>
+                        {Array.from({ length: mealsPerDay }).map((_, idx) => (
+                            <div key={idx} className="flex items-center gap-2 mb-2">
+                                <span>{currency === 'INR' ? '₹' : '$'}</span>
+                                <input
+                                    type="number"
+                                    min={0}
+                                    value={mealBudgets[idx] || ''}
+                                    onChange={e => {
+                                        const newBudgets = [...mealBudgets];
+                                        newBudgets[idx] = Number(e.target.value);
+                                        setMealBudgets(newBudgets);
+                                    }}
+                                    placeholder={`Meal ${idx + 1} Budget`}
+                                    className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-400"
+                                    required
+                                />
+                            </div>
+                        ))}
+                    </div>
+
                     <div>
                         <label className="block text-gray-700 font-semibold mb-2">Diet Preferences:</label>
                         <select
@@ -175,11 +241,11 @@ const CreateAcc = () => {
                     </button>
                 </form>
                 <p className="text-center text-gray-600">
-                Already have an account?
-                <NavLink to="/login" className="text-green-600 hover:underline">
-                    Login
-                </NavLink>
-            </p>
+                    Already have an account?
+                    <NavLink to="/login" className="text-green-600 hover:underline">
+                        Login
+                    </NavLink>
+                </p>
             </div>
         </>
     )

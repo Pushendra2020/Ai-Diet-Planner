@@ -32,6 +32,23 @@ const userSchema = new Schema(
       require: true,
       enum: ["Male", "Female"],
     },
+    mealsPerDay: {
+      type: Number,
+      default: 3, // or whatever default you want
+      min: 1,
+      max: 10
+    },
+
+    currency: {
+      type: String,
+      enum: ['INR', 'USD'],
+      default: 'INR'
+    },
+    
+    mealBudgets: {
+      type: [Number], // e.g. [100, 200, 300] for each meal
+      default: []
+    },
     height: {//in CM
       type: Number,
       require: true,

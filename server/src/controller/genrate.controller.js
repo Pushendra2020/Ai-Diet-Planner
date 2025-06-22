@@ -1,9 +1,9 @@
 import { dietPlan } from "../models/dietPlan.model.js";
 import { User } from "../models/user.model.js";
 import { Health } from "../models/health.model.js";
-import axios from "axios"; 
+import axios from "axios";
 import ApiResponse from "../utils/ApiResponse.js";
-import {ApiError} from "../utils/ApiError.js"
+import { ApiError } from "../utils/ApiError.js"
 
 
 const callGemini = async (prompt) => {
@@ -20,24 +20,50 @@ const callGemini = async (prompt) => {
   return data?.candidates?.[0]?.content?.parts?.[0]?.text || "";
 };
 
+const createDietPrompt = (user, health) => {
+  const mealCount = user.mealsPerDay || 3;
+  const budgets = user.mealBudgets && user.mealBudgets.length === mealCount
+    ? user.mealBudgets.join(', ')
+    : 'not specified';
 
-const createDietPrompt = (user, health) => `
-Create a personalized diet plan based on the following:
-User: ${user.username}, Age: ${user.age}, Gender: ${user.gender}, Height: ${user.height}cm, Weight: ${user.weight}kg
-Goal: ${user.goal}, Activity: ${user.activityLevel}, Preferences: ${user.dietPreferences}, BMI:${health.bmi}, Calorie Need:${health.calorieNeed}, BMR:${health.bmr}, TDEE:${health.tdee}
+  return `
+Create a personalized diet plan for the following user:
+- Name: ${user.username}
+- Age: ${user.age}
+- Gender: ${user.gender}
+- Height: ${user.height}cm
+- Weight: ${user.weight}kg
+- Goal: ${user.goal}
+- Activity Level: ${user.activityLevel}
+- Preferences: ${user.dietPreferences}
+- BMI: ${health.bmi}
+- Calorie Need: ${health.calorieNeed}
+- Meals per day: ${mealCount}
+- Money budget for each meal (in ${user.currency}): ${budgets}
 
-Return JSON format:
+**Instructions:**
+- Distribute the total daily calories across ${mealCount} meals.
+- For each meal, provide only:
+  - The dish name (e.g., \"Paneer Curry\")
+  - The quantity (e.g., \"2 chapati + 1 bowl curry\")
+  - The total calories for the meal
+  - Macros (protein, carbs, fat)
+  - Estimated cost (optional)
+- Do NOT include an ingredients list.
+- Name the meals as \"Meal 1\", \"Meal 2\", etc.
+- Return the result in this JSON format:
 [
   {
-    "mealType": "breakfast",
-    "name": "Oats with banana",
-    "ingredients": ["Oats - 50g", "Milk - 200ml", "Banana - 1"],
-    "calories": 350,
-    "macros": { "protein": 12, "carbs": 60, "fat": 8 }
+    \"mealType\": \"Meal 1\",
+    \"name\": \"Paneer Curry\",
+    \"quantity\": \"2 chapati + 1 bowl curry\",
+    \"calories\": 350,
+    \"macros\": { \"protein\": 12, \"carbs\": 60, \"fat\": 8 },
+    \"estimatedCost\": 50
   }
 ]
 `;
-
+};
 
 const generateDietPlanAI = async (req, res) => {
   try {
@@ -71,19 +97,11 @@ const generateDietPlanAI = async (req, res) => {
       });
     }
 
-    // Normalize mealType
-    parsedMeals = parsedMeals.map((meal) => {
-      if (
-        meal.mealType &&
-        !["breakfast", "lunch", "dinner", "snack"].includes(meal.mealType)
-      ) {
-        if (meal.mealType.toLowerCase().includes("snack")) {
-          return { ...meal, mealType: "snack" };
-        }
-        return { ...meal, mealType: "snack" };
-      }
-      return meal;
-    });
+    // Rename all mealTypes to 'Meal 1', 'Meal 2', etc.
+    parsedMeals = parsedMeals.map((meal, idx) => ({
+      ...meal,
+      mealType: `Meal ${idx + 1}`
+    }));
 
     const totalCalories = parsedMeals.reduce(
       (sum, m) => sum + (m.calories || 0),

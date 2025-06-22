@@ -3,18 +3,21 @@ import mongoose, { Schema } from "mongoose";
 const mealSchema = new Schema({
   mealType: {
     type: String,
-    enum: ["breakfast", "lunch", "dinner", "snack"],
+    required: true,
   },
   name: {
     type: String,
     require: true,
   },
-  ingredients: {
-    type: [String],
+
+  quantity: { 
+    type: String ,
+  required: true,
   },
+ 
   
   calories: Number,
-
+  estimatedCost: Number,
   macros: {
     protein: {
       type: Number,

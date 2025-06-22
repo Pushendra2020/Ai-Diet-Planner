@@ -1,10 +1,10 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import axios from 'axios';
-import { useDispatch,useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { login } from '../app/authSlice.js';
 const EditProfile = () => {
-     const userData = useSelector((state) => state.auth.userData);
+    const userData = useSelector((state) => state.auth.userData);
     const [age, setAge] = useState(userData.age || 0);
     const [gender, setGender] = useState(userData.gender)
     const [height, setHeight] = useState(userData.height || 0);
@@ -13,15 +13,28 @@ const EditProfile = () => {
     const [goal, setGoal] = useState(userData.goal || 'lose');
     const [dietPreferences, setDietPreferences] = useState(userData.dietaryPreferences || 'Vegetarian');
     const [allergies, setAllergies] = useState(userData.allergies || []);
+    const [currency, setCurrency] = useState(userData.currency || 'INR');
+    const [mealsPerDay, setMealsPerDay] = useState(userData.mealsPerDay || 3);
+    const [mealBudgets, setMealBudgets] = useState(userData.mealBudgets || [0, 0, 0]);
     const dispatch = useDispatch();
     const navigate = useNavigate();
+
+
+    useEffect(() => {
+        setMealBudgets((prev) => {
+            const arr = [...prev];
+            arr.length = mealsPerDay;
+            return arr.map((v, i) => arr[i] || 0);
+        });
+    }, [mealsPerDay]);
 
     const handleForm = async (e) => {
         try {
             e.preventDefault();
             const response = await axios.post('http://localhost:5000/api/v2/users/updateUser', {
-                age, gender, height, weight, activityLevel, goal, dietPreferences, allergies
-            },{withCredentials: true});
+                age, gender, height, weight, activityLevel, goal, dietPreferences,
+                allergies, mealsPerDay, mealBudgets, currency
+            }, { withCredentials: true });
             if (response.data.success) {
                 console.log(response.data);
                 dispatch(login({ userData: response.data.data.user }));
@@ -116,6 +129,59 @@ const EditProfile = () => {
                             <option value="lose">Lose (Losing Your Weight)</option>
                         </select>
                     </div>
+
+                    <div>
+                        <label className="block text-gray-700 font-semibold mb-2">Meals Per Day:</label>
+                        <input
+                            type="number"
+                            min={1}
+                            max={10}
+                            value={mealsPerDay}
+                            onChange={e => setMealsPerDay(Number(e.target.value))}
+                            className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-400"
+                            required
+                        />
+                    </div>
+
+
+                    <div>
+                        <label className="block text-gray-700 font-semibold mb-2">Currency:</label>
+                        <select
+                            value={currency}
+                            onChange={e => setCurrency(e.target.value)}
+                            className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-400"
+                            required
+                        >
+                            <option value="INR">INR (₹)</option>
+                            <option value="USD">USD ($)</option>
+                        </select>
+                    </div>
+
+// Meal budget inputs:
+                    <div>
+                        <label className="block text-gray-700 font-semibold mb-2">
+                            Meal Budgets (per meal, in {currency === 'INR' ? '₹' : '$'}):
+                        </label>
+                        {Array.from({ length: mealsPerDay }).map((_, idx) => (
+                            <div key={idx} className="flex items-center gap-2 mb-2">
+                                <span>{currency === 'INR' ? '₹' : '$'}</span>
+                                <input
+                                    type="number"
+                                    min={0}
+                                    value={mealBudgets[idx] || ''}
+                                    onChange={e => {
+                                        const newBudgets = [...mealBudgets];
+                                        newBudgets[idx] = Number(e.target.value);
+                                        setMealBudgets(newBudgets);
+                                    }}
+                                    placeholder={`Meal ${idx + 1} Budget`}
+                                    className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-400"
+                                    required
+                                />
+                            </div>
+                        ))}
+                    </div>
+
                     <div>
                         <label className="block text-gray-700 font-semibold mb-2">Diet Preferences:</label>
                         <select
