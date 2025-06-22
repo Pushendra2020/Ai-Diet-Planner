@@ -17,9 +17,11 @@ app.use(cookieParser())
 //Import Routs
 
 import router from "./routes/user.routes.js"
+import dietRouter from "./routes/diet.route.js"
 
 //Declaring Routs
 
 
 app.use("/api/v2/users",router)
+app.use("/api/v2/diet", dietRouter)
 export default app

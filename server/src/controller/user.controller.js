@@ -5,7 +5,6 @@ import { User } from "../models/user.model.js";
 import {Health} from "../models/health.model.js"
 import jwt from "jsonwebtoken";
 import { calculateAndSaveHealth } from "../utils/calculateAndSaveHealth.js";
-
 const generateAccessAndRefreshToken = async (userId) => {
   try {
     const user = await User.findById(userId);
