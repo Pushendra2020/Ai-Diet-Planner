@@ -1,11 +1,16 @@
 import React, { useEffect, useState } from 'react'
 import axios from 'axios'
-import { FaUtensils, FaLeaf, FaFireAlt, FaMoneyBillWave, FaBalanceScale, FaCircle } from 'react-icons/fa';
+import { useSelector } from 'react-redux'
+import { FaUtensils, FaLeaf, FaFireAlt, FaMoneyBillWave, FaBalanceScale, FaCircle, FaRobot, FaTimes } from 'react-icons/fa';
+import ChatWithAI from './ChatWithAI';
 
 const Diet = () => {
     const [dietPlan, setDietPlan] = useState(null)
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState(null)
+    const [healthInfo, setHealthInfo] = useState(null)
+    const [chatOpen, setChatOpen] = useState(false)
+    const userData = useSelector((state) => state.auth.userData)
 
     const fetchDietPlan = async () => {
         setLoading(true)
@@ -23,8 +28,20 @@ const Diet = () => {
         }
     };
 
+    const fetchHealthInfo = async () => {
+        try {
+            const response = await axios.get('http://localhost:5000/api/v2/users/userHealth', { withCredentials: true })
+            if (response.data.success) {
+                setHealthInfo(response.data.data.healthUser[0])
+            }
+        } catch (error) {
+            setHealthInfo(null)
+        }
+    }
+
     useEffect(() => {
         fetchDietPlan();
+        fetchHealthInfo();
         document.title = 'Diet Plan'
     }, [])
 
@@ -61,19 +78,15 @@ const Diet = () => {
                         </div>
                         <div>
                             <h3 className="font-semibold text-lg mb-4 text-gray-700 animate-fade-in">Meals</h3>
-                            {/* Timeline/Stepper for meals */}
                             <div className="relative pl-8">
                                 {dietPlan.meals && dietPlan.meals.map((meal, idx) => (
                                     <div key={idx} className="relative flex items-start mb-12 last:mb-0 group">
-                                        {/* Timeline vertical line (only between meals) */}
                                         {idx !== dietPlan.meals.length - 1 && (
                                             <span className="absolute left-4 top-8 w-1 h-[calc(100%-2.5rem)] bg-gradient-to-b from-green-300 to-green-100 rounded-full z-0"></span>
                                         )}
-                                        {/* Timeline dot, vertically centered with card */}
                                         <span className="absolute left-0 top-6 z-10 flex items-center justify-center w-8 h-8 bg-white border-4 border-green-400 rounded-full shadow animate-pop-in">
                                             <FaCircle className="text-green-400 animate-pulse text-lg" />
                                         </span>
-                                        {/* Meal card */}
                                         <div className="ml-12 w-full bg-white/80 backdrop-blur-lg border border-green-200 rounded-2xl shadow-xl p-6 flex flex-col gap-4 hover:scale-[1.02] hover:shadow-2xl transition-all duration-300 ease-out group cursor-pointer animate-pop-in">
                                             <div className="flex items-center gap-2 mb-1">
                                                 <span className="inline-block px-3 py-1 rounded-full bg-gradient-to-r from-green-200 to-green-100 text-green-800 text-xs font-bold uppercase tracking-wide shadow group-hover:scale-105 group-hover:bg-green-300 transition-transform">
@@ -116,6 +129,29 @@ const Diet = () => {
                     <div className="text-gray-600 mt-4 text-center animate-fade-in">No diet plan available.</div>
                 )}
             </div>
+            {/* Floating Chat Button */}
+            <button
+                className="fixed bottom-8 right-8 z-50 bg-green-500 hover:bg-green-600 text-white rounded-full shadow-lg w-16 h-16 flex items-center justify-center text-3xl transition-all duration-200"
+                onClick={() => setChatOpen(true)}
+                aria-label="Open AI Chat"
+            >
+                <FaRobot />
+            </button>
+            {/* Chat Modal */}
+            {chatOpen && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30">
+                    <div className="relative w-full max-w-lg mx-auto bg-white/90 rounded-2xl shadow-2xl p-0 md:p-4 animate-fade-in-up">
+                        <button
+                            className="absolute top-2 right-2 text-green-600 hover:text-green-800 text-2xl p-2 rounded-full focus:outline-none"
+                            onClick={() => setChatOpen(false)}
+                            aria-label="Close Chat"
+                        >
+                            <FaTimes />
+                        </button>
+                        <ChatWithAI userData={userData} dietPlane={dietPlan} healthInfo={healthInfo} />
+                    </div>
+                </div>
+            )}
             {/* Custom Animations (Tailwind plugin or custom CSS required) */}
             <style>{`
                 @keyframes fade-in-down { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: none; } }

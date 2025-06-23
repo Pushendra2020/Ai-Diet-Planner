@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { useSelector } from 'react-redux'
 import { NavLink } from 'react-router-dom'
 import axios from 'axios'
+import { FaMoneyBillWave, FaUser, FaHeartbeat, FaUtensils } from 'react-icons/fa'
 
 const Profile = () => {
   const [userHealth, setUserHealth] = useState(null)
@@ -26,46 +27,77 @@ const Profile = () => {
     fetchUserHealthData()
   }, [])
 
-  return (
-    <div className="min-h-screen bg-gradient-to-b from-green-50 to-white pt-24 pb-10 px-4">
-      <div className="max-w-4xl mx-auto bg-white shadow-2xl rounded-3xl p-10 border border-green-100">
-        <h1 className="text-4xl font-bold text-center text-green-600 mb-10 drop-shadow-md">👤 User Profile</h1>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-          {/* User Info */}
-          <div className="bg-gray-50 rounded-xl p-6 shadow-md border border-gray-200">
-            <h2 className="text-2xl font-semibold text-green-700 mb-4">User Information</h2>
-            <ul className="space-y-2 text-sm md:text-base">
-              <li><span className="font-semibold text-green-600">Name:</span> {userData.username}</li>
-              <li><span className="font-semibold text-green-600">Email:</span> {userData.email}</li>
-              <li><span className="font-semibold text-green-600">Age:</span> {userData.age}</li>
-              <li><span className="font-semibold text-green-600">Gender:</span> {userData.gender}</li>
-              <li><span className="font-semibold text-green-600">Height:</span> {userData.height} cm</li>
-              <li><span className="font-semibold text-green-600">Weight:</span> {userData.weight} kg</li>
-              <li><span className="font-semibold text-green-600">Activity Level:</span> {userData.activityLevel}</li>
-              <li><span className="font-semibold text-green-600">Goal:</span> {userData.goal}</li>
-              <li><span className="font-semibold text-green-600">Dietary Preferences:</span> {userData.dietPreferences}</li>
-              <li>
-                <span className="font-semibold text-green-600">Allergies:</span>{" "}
-                {userData.allergies && userData.allergies.length > 0
-                  ? userData.allergies.join(', ')
-                  : <span className="italic text-gray-400">None</span>}
-              </li>
-              <li><span className="font-semibold text-green-600">Created At:</span> {userData.createdAt && new Date(userData.createdAt).toLocaleString()}</li>
-              <li><span className="font-semibold text-green-600">Updated At:</span> {userData.updatedAt && new Date(userData.updatedAt).toLocaleString()}</li>
-            </ul>
-          </div>
+  // Determine currency symbol
+  const currency = userData.currency || 'INR';
+  const currencySymbol = currency === 'USD' ? '$' : '₹';
 
-          {/* Health Info */}
-          <div className="bg-gray-50 rounded-xl p-6 shadow-md border border-gray-200">
-            <h2 className="text-2xl font-semibold text-green-700 mb-4">Health Metrics</h2>
+  return (
+    <div className="min-h-screen bg-gradient-to-b from-green-50 to-white pt-24 pb-10 px-2 md:px-4">
+      <div className="max-w-3xl mx-auto">
+        <div className="flex flex-col md:flex-row md:items-end md:justify-between mb-8 gap-4">
+          <h1 className="text-3xl md:text-4xl font-bold text-green-700 flex items-center gap-3 mb-2">
+            <FaUser className="text-green-400" /> Profile
+          </h1>
+          <NavLink
+            to="/editprofile"
+            className="inline-block px-6 py-2 text-white font-semibold bg-gradient-to-r from-green-500 to-lime-500 rounded-full shadow hover:from-green-600 hover:to-lime-600 transition"
+          >
+            ✏️ Edit Profile
+          </NavLink>
+        </div>
+        <div className="flex flex-col gap-8">
+          {/* Personal Info Card */}
+          <section className="bg-white/80 rounded-2xl p-6 shadow border border-green-100 flex flex-col gap-2">
+            <h2 className="text-xl font-semibold text-green-700 mb-2 flex items-center gap-2">
+              <FaUtensils className="text-green-400" /> Personal Info
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-2 text-sm md:text-base">
+              <div><span className="font-semibold text-green-600">Name:</span> {userData.username}</div>
+              <div><span className="font-semibold text-green-600">Email:</span> {userData.email}</div>
+              <div><span className="font-semibold text-green-600">Age:</span> {userData.age}</div>
+              <div><span className="font-semibold text-green-600">Gender:</span> {userData.gender}</div>
+              <div><span className="font-semibold text-green-600">Height:</span> {userData.height} cm</div>
+              <div><span className="font-semibold text-green-600">Weight:</span> {userData.weight} kg</div>
+              <div><span className="font-semibold text-green-600">Activity Level:</span> {userData.activityLevel}</div>
+              <div><span className="font-semibold text-green-600">Goal:</span> {userData.goal}</div>
+              <div><span className="font-semibold text-green-600">Dietary Pref.:</span> {userData.dietPreferences}</div>
+              <div><span className="font-semibold text-green-600">Allergies:</span> {userData.allergies && userData.allergies.length > 0 ? userData.allergies.join(', ') : <span className="italic text-gray-400">None</span>}</div>
+              <div><span className="font-semibold text-green-600">Meals/Day:</span> {userData.mealsPerDay || 3}</div>
+              <div><span className="font-semibold text-green-600">Currency:</span> {currencySymbol} ({currency})</div>
+              <div className="md:col-span-2">
+                <span className="font-semibold text-green-600">Meal Budgets:</span>{' '}
+                {userData.mealBudgets && userData.mealBudgets.length > 0 ? (
+                  <span className="ml-2 flex flex-wrap gap-2 mt-1">
+                    {userData.mealBudgets.map((budget, idx) => (
+                      <span key={idx} className="inline-flex items-center gap-1 bg-green-50 border border-green-200 rounded px-2 py-1 text-green-700 text-xs font-semibold">
+                        <FaMoneyBillWave className="text-green-400" />
+                        {currencySymbol}{budget} <span className="text-gray-400">(Meal {idx + 1})</span>
+                      </span>
+                    ))}
+                  </span>
+                ) : (
+                  <span className="italic text-gray-400 ml-1">Not specified</span>
+                )}
+              </div>
+            </div>
+            <div className="flex flex-wrap gap-4 mt-4 text-xs text-gray-500">
+              <div>Created: {userData.createdAt && new Date(userData.createdAt).toLocaleString()}</div>
+              <div>Updated: {userData.updatedAt && new Date(userData.updatedAt).toLocaleString()}</div>
+            </div>
+          </section>
+
+          {/* Health Metrics Card */}
+          <section className="bg-white/80 rounded-2xl p-6 shadow border border-green-100 flex flex-col gap-2">
+            <h2 className="text-xl font-semibold text-green-700 mb-2 flex items-center gap-2">
+              <FaHeartbeat className="text-pink-400" /> Health Metrics
+            </h2>
             {userHealth ? (
-              <ul className="space-y-2 text-sm md:text-base">
-                <li><span className="font-semibold text-green-600">BMI:</span> {userHealth.healthUser[0].bmi}</li>
-                <li><span className="font-semibold text-green-600">BMR:</span> {userHealth.healthUser[0].bmr}</li>
-                <li><span className="font-semibold text-green-600">TDEE:</span> {userHealth.healthUser[0].tdee}</li>
-                <li><span className="font-semibold text-green-600">Calorie Need:</span> {userHealth.healthUser[0].calorieNeed}</li>
-              </ul>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-2 text-sm md:text-base">
+                <div><span className="font-semibold text-green-600">BMI:</span> {userHealth.healthUser[0].bmi}</div>
+                <div><span className="font-semibold text-green-600">BMR:</span> {userHealth.healthUser[0].bmr}</div>
+                <div><span className="font-semibold text-green-600">TDEE:</span> {userHealth.healthUser[0].tdee}</div>
+                <div><span className="font-semibold text-green-600">Calorie Need:</span> {userHealth.healthUser[0].calorieNeed}</div>
+              </div>
             ) : (
               <div className="flex items-center gap-2 text-gray-500 mt-4">
                 <svg className="animate-spin h-5 w-5 text-green-400" viewBox="0 0 24 24">
@@ -75,17 +107,7 @@ const Profile = () => {
                 <span className="italic">Loading health data...</span>
               </div>
             )}
-          </div>
-        </div>
-
-        {/* Edit Button */}
-        <div className="flex justify-center mt-12">
-          <NavLink
-            to="/editprofile"
-            className="inline-block px-8 py-3 text-white font-semibold bg-gradient-to-r from-green-500 to-lime-500 rounded-full shadow-lg hover:from-green-600 hover:to-lime-600 transition duration-200"
-          >
-            ✏️ Edit Profile
-          </NavLink>
+          </section>
         </div>
       </div>
     </div>

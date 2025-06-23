@@ -54,4 +54,5 @@ const dietPlanSchema = new Schema(
   { timestamps: true }
 );
 
-export const dietPlan = mongoose.model("dietPlan", dietPlanSchema);
+ const dietPlan = mongoose.model("dietPlan", dietPlanSchema);
+export default dietPlan;
