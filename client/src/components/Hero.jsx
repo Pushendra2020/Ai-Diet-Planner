@@ -22,6 +22,9 @@ const features = [
 ]
 
 const Hero = () => {
+  axios.get("/").then((response) => {
+    console.log("response.data");
+  });
   return (
     <section className="relative w-full min-h-[90vh] flex items-center justify-center bg-gradient-to-br from-green-50 via-white to-lime-100 overflow-hidden">
       {/* Animated glowing gradients */}
