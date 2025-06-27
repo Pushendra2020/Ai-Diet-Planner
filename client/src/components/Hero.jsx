@@ -1,5 +1,6 @@
 import React from 'react'
 import '../index.css'
+import axios from 'axios'
 import { FaRobot, FaAppleAlt, FaHeartbeat, FaMoneyBillWave } from 'react-icons/fa'
 
 const features = [
