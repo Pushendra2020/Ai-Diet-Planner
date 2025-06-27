@@ -22,7 +22,7 @@ const CreateAcc = () => {
 
     const handleForm = async (e) => {
         e.preventDefault();
-        await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/v2/users/register`, {
+        await axios.post(`https://ai-diet-planner-dcal.onrender.com/api/v2/users/register`, {
             username, email, password, age, gender, height, weight, activityLevel, goal,
             dietPreferences, allergies, mealsPerDay, mealBudgets, currency
         }).then(function (response) {

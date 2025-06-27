@@ -16,7 +16,7 @@ const Diet = () => {
         setLoading(true)
         setError(null)
         try {
-            const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/v2/diet/generate`,  {
+            const response = await axios.get(`https://ai-diet-planner-dcal.onrender.com/api/v2/diet/generate`,  {
                 withCredentials: true,
             });
             setDietPlan(response.data.data.newPlan)
@@ -30,7 +30,7 @@ const Diet = () => {
 
     const fetchHealthInfo = async () => {
         try {
-            const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/v2/users/userHealth`, { withCredentials: true })
+            const response = await axios.get(`https://ai-diet-planner-dcal.onrender.com/api/v2/users/userHealth`, { withCredentials: true })
             if (response.data.success) {
                 setHealthInfo(response.data.data.healthUser[0])
             }

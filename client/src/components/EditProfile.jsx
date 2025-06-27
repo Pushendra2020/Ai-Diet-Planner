@@ -31,7 +31,7 @@ const EditProfile = () => {
     const handleForm = async (e) => {
         try {
             e.preventDefault();
-            const response = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/v2/users/updateUser`, {
+            const response = await axios.post(`https://ai-diet-planner-dcal.onrender.com/api/v2/users/updateUser`, {
                 age, gender, height, weight, activityLevel, goal, dietPreferences,
                 allergies, mealsPerDay, mealBudgets, currency
             }, { withCredentials: true });
