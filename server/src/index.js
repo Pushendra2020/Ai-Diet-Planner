@@ -16,3 +16,7 @@ connectDB()
 .catch((error)=>{
     console.log("Failed to Connect :( ",error)
 })
+
+app.get('/', (req, res) => {
+    res.send('Backend is running');
+});

@@ -24,4 +24,7 @@ import dietRouter from "./routes/diet.route.js"
 
 app.use("/api/v2/users",router)
 app.use("/api/v2/diet", dietRouter)
+app.get('/', (req, res) => {
+    res.send('Backend is running');
+});
 export default app
