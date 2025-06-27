@@ -149,7 +149,7 @@ const userLogin = asyncHandler(async (req, res) => {
   const options = {
     httpOnly: true,
     secure: true,
-    sameSite: "strict",
+    sameSite: "None",
     maxAge: 7 * 24 * 60 * 60 * 1000,
   };
 
@@ -221,7 +221,7 @@ const refereshAccessToken = asyncHandler(async (req, res) => {
     const options = {
       httpOnly: true,
       secure: true,
-      sameSite: "strict",
+      sameSite: "None",
       maxAge: 7 * 24 * 60 * 60 * 1000,
     };
 
