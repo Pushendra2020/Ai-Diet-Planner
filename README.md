@@ -1,6 +1,6 @@
 # 🥗 AI-Based Diet Planner
 
-An intelligent web application built with the **MERN stack** (MongoDB, Express, React, Node.js) that helps users generate **personalized diet plans** based on their health goals, preferences, and biometric data. The system also includes smart health calculators for BMI, calorie needs, body fat percentage, and more.
+An intelligent web application built with the **MERN stack** (MongoDB, Express, React, Node.js) that helps users generate **personalized diet plans** based on their health goals, preferences, and biometric data. The system also includes smart health calculators like BMI, BMR, TDEE, and calorie needs estimators.
 
 ---
 
@@ -11,37 +11,27 @@ An intelligent web application built with the **MERN stack** (MongoDB, Express, 
 - 🧠 **Data Models** for user profiles, diet plans, preferences, etc.
 - 📊 **Frontend Health Calculators**:
   - BMI Calculator
+  - BMR (Basal Metabolic Rate) Calculator
   - Calorie Needs Estimator
-  - Body Fat Percentage Estimator
+  - TDEE (Total Daily Energy Expenditure) Calculator
+- 🤖 **AI-Powered Diet Plan Generator** (based on user inputs and preferences)
+- 📋 **Food & Nutrient Database Integration**
 
 ### 🛠️ In Progress
-- 🤖 AI-Powered Diet Plan Generator (based on inputs and preferences)
-- 📈 Personalized Dashboard with analytics and insights
-- 📋 Food & Nutrient Database Integration
 - 🧾 Weekly Meal Planner with export options (PDF, print)
-- 🧠 AI Recommendations (e.g., “What to eat today?” based on goals)
-
+- 
 ---
 
 ## 🧰 Tech Stack
 
 ### Frontend
 - **React.js** with Vite
-- Tailwind CSS / CSS Modules (optional, depending on your setup)
-- Axios for API calls
+- **Tailwind CSS** for styling
+- **Axios** for API calls
 
 ### Backend
 - **Node.js** + **Express.js**
 - **MongoDB** with Mongoose ODM
 - **JWT Authentication**
 - AI services (planned): OpenAI, Gemini, or custom ML model integration
-
-### Other Tools (Planned)
-- **Firebase** or **Appwrite** for optional image/file storage
-- **Chart.js** or **Recharts** for data visualization
-- **Colab/Flask (optional)** for running AI models
-
----
-
-## 📂 Project Structure
 
