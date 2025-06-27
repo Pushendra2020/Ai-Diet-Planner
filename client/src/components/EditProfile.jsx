@@ -157,7 +157,6 @@ const EditProfile = () => {
                         </select>
                     </div>
 
-// Meal budget inputs:
                     <div>
                         <label className="block text-gray-700 font-semibold mb-2">
                             Meal Budgets (per meal, in {currency === 'INR' ? '₹' : '$'}):

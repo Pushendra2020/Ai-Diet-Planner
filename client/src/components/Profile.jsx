@@ -7,6 +7,11 @@ import { FaMoneyBillWave, FaUser, FaHeartbeat, FaUtensils } from 'react-icons/fa
 const Profile = () => {
   const [userHealth, setUserHealth] = useState(null)
   const userData = useSelector((state) => state.auth.userData)
+  const [showChangePassword, setShowChangePassword] = useState(false);
+  const [oldPassword, setOldPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [passwordLoading, setPasswordLoading] = useState(false);
+  const [passwordMessage, setPasswordMessage] = useState(null);
 
   const fetchUserHealthData = async () => {
     try {
@@ -38,12 +43,20 @@ const Profile = () => {
           <h1 className="text-3xl md:text-4xl font-bold text-green-700 flex items-center gap-3 mb-2">
             <FaUser className="text-green-400" /> Profile
           </h1>
-          <NavLink
-            to="/editprofile"
-            className="inline-block px-6 py-2 text-white font-semibold bg-gradient-to-r from-green-500 to-lime-500 rounded-full shadow hover:from-green-600 hover:to-lime-600 transition"
-          >
-            ✏️ Edit Profile
-          </NavLink>
+          <div className="flex gap-2">
+            <NavLink
+              to="/editprofile"
+              className="inline-block px-6 py-2 text-white font-semibold bg-gradient-to-r from-green-500 to-lime-500 rounded-full shadow hover:from-green-600 hover:to-lime-600 transition"
+            >
+              ✏️ Edit Profile
+            </NavLink>
+            <button
+              onClick={() => setShowChangePassword(true)}
+              className="inline-block px-6 py-2 text-white font-semibold bg-gradient-to-r from-pink-500 to-red-400 rounded-full shadow hover:from-pink-600 hover:to-red-500 transition"
+            >
+              🔒 Change Password
+            </button>
+          </div>
         </div>
         <div className="flex flex-col gap-8">
           {/* Personal Info Card */}
@@ -110,6 +123,79 @@ const Profile = () => {
           </section>
         </div>
       </div>
+      {/* Change Password Modal */}
+      {showChangePassword && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+          <div className="bg-white rounded-2xl shadow-lg p-8 w-full max-w-md relative">
+            <button
+              className="absolute top-2 right-2 text-gray-400 hover:text-gray-700 text-2xl"
+              onClick={() => {
+                setShowChangePassword(false);
+                setPasswordMessage(null);
+                setOldPassword('');
+                setNewPassword('');
+              }}
+            >
+              &times;
+            </button>
+            <h2 className="text-xl font-bold mb-4 text-green-700">Change Password</h2>
+            <form
+              onSubmit={async (e) => {
+                e.preventDefault();
+                setPasswordLoading(true);
+                setPasswordMessage(null);
+                try {
+                  const res = await axios.post(
+                    'http://localhost:5000/api/v2/users/changepassword',
+                    { oldPassword, newPassword },
+                    { withCredentials: true }
+                  );
+                  if (res.data.success) {
+                    setPasswordMessage({ type: 'success', text: 'Password changed successfully!' });
+                    setOldPassword('');
+                    setNewPassword('');
+                  } else {
+                    setPasswordMessage({ type: 'error', text: res.data.message || 'Failed to change password.' });
+                  }
+                } catch (err) {
+                  setPasswordMessage({ type: 'error', text: err.response?.data?.message || 'Failed to change password.' });
+                }
+                setPasswordLoading(false);
+              }}
+              className="flex flex-col gap-4"
+            >
+              <input
+                type="password"
+                placeholder="Old Password"
+                className="border rounded px-3 py-2"
+                value={oldPassword}
+                onChange={e => setOldPassword(e.target.value)}
+                required
+              />
+              <input
+                type="password"
+                placeholder="New Password"
+                className="border rounded px-3 py-2"
+                value={newPassword}
+                onChange={e => setNewPassword(e.target.value)}
+                required
+              />
+              <button
+                type="submit"
+                className="bg-green-500 hover:bg-green-600 text-white font-semibold rounded px-4 py-2 transition"
+                disabled={passwordLoading}
+              >
+                {passwordLoading ? 'Changing...' : 'Change Password'}
+              </button>
+              {passwordMessage && (
+                <div className={`mt-2 text-sm ${passwordMessage.type === 'success' ? 'text-green-600' : 'text-red-500'}`}>
+                  {passwordMessage.text}
+                </div>
+              )}
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

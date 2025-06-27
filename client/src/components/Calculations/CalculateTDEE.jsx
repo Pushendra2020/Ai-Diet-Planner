@@ -1,8 +1,8 @@
 import React, { useState } from 'react'
+import { FaHeartbeat, FaRunning, FaFire } from 'react-icons/fa'
 import { calculateTDEE } from './calculate.js'
 
 const CalculateTDEE = () => {
-
   const [bmr, setBmr] = useState(0);
   const [activityLevel, setActivityLevel] = useState('sedentary');
   const [tdee, setTdee] = useState(null);
@@ -13,13 +13,16 @@ const CalculateTDEE = () => {
   }
 
   return (
-    <>
-      <div className="container mx-auto px-4 py-8">
-        <h1 className="text-3xl font-bold text-center ">Calculate Your TDEE</h1>
-        <form className="max-w-md mx-auto mt-8" onSubmit={handleForm}>
-          <div className="mb-4">
-            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="weight">
-              BMR
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-50 to-blue-100 py-10">
+      <div className="backdrop-blur-md bg-white/60 border border-blue-100 rounded-3xl shadow-2xl p-8 w-full max-w-lg mx-auto">
+        <h1 className="text-4xl font-extrabold text-blue-700 text-center mb-2 flex items-center justify-center gap-2">
+          <FaFire className="text-orange-400" /> TDEE Calculator
+        </h1>
+        <p className="text-center text-gray-500 mb-8">Total Daily Energy Expenditure estimates your daily calorie burn.</p>
+        <form className="flex flex-col gap-6" onSubmit={handleForm}>
+          <div>
+            <label className="block text-blue-700 font-semibold mb-1" htmlFor="bmr">
+              <span className="inline-flex items-center gap-2"><FaHeartbeat /> BMR</span>
             </label>
             <input
               type="number"
@@ -28,23 +31,21 @@ const CalculateTDEE = () => {
               onChange={(e) => setBmr(e.target.value)}
               name="bmr"
               placeholder="Enter your BMR in kilocalories"
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+              className="w-full px-4 py-2 rounded-lg border border-blue-200 bg-white/70 focus:outline-none focus:ring-2 focus:ring-blue-300 text-gray-700"
               required
             />
           </div>
-
-          <div className="mb-4">
-            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="height">
-              Activity Level
+          <div>
+            <label className="block text-blue-700 font-semibold mb-1" htmlFor="activityLevel">
+              <span className="inline-flex items-center gap-2"><FaRunning /> Activity Level</span>
             </label>
             <select
               id="activityLevel"
               name="activityLevel"
               onChange={(e) => setActivityLevel(e.target.value)}
-              className="shadow border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+              className="w-full px-4 py-2 rounded-lg border border-blue-200 bg-white/70 focus:outline-none focus:ring-2 focus:ring-blue-300 text-gray-700"
               required
             >
-
               <option value="sedentary">Sedentary Activity (No exercise)</option>
               <option value="light">Light Activity</option>
               <option value="moderate">Moderate Activity</option>
@@ -52,21 +53,20 @@ const CalculateTDEE = () => {
               <option value="very active">Super Active Activity</option>
             </select>
           </div>
-
           <button
             type="submit"
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full"
+            className="w-full py-3 rounded-lg bg-gradient-to-r from-blue-500 to-green-400 text-white font-bold text-lg shadow hover:from-blue-600 hover:to-green-500 transition"
           >
             Calculate TDEE
           </button>
         </form>
         {tdee && (
-          <div className="mt-6 text-center">
-            <h2 className="text-2xl font-bold">Your TDEE is: {tdee} kcal/day</h2>
+          <div className="mt-8 text-center animate-fade-in-up">
+            <h2 className="text-2xl font-bold text-blue-700 mb-2">Your TDEE is: <span className="text-3xl text-green-600">{tdee} kcal/day</span></h2>
           </div>
         )}
       </div>
-    </>
+    </div>
   )
 }
 

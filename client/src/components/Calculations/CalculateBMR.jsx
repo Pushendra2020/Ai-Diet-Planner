@@ -1,5 +1,6 @@
 import React from 'react'
 import { useState } from 'react'
+import { FaWeight, FaRulerVertical, FaUser, FaVenusMars, FaHeartbeat } from 'react-icons/fa'
 import { calculateBMR } from './calculate.js'
 // import { useNavigate } from 'react-router-dom'
 const CalculateBMR = () => {
@@ -10,22 +11,22 @@ const CalculateBMR = () => {
   const [bmr, setBmr] = useState(null);
   const handleForm = (e) => {
     e.preventDefault();
-
     const bmrValue = calculateBMR(weight, height, age, gender);
     setBmr(bmrValue);
   }
 
-
   return (
-    <>
-      <div className="container mx-auto px-4 py-8">
-        <h1 className="text-3xl font-bold text-center mt-10">Calculate Your BMR</h1>
-        <form className="max-w-md mx-auto mt-8" onSubmit={handleForm}>
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-50 to-blue-100 py-10">
+      <div className="backdrop-blur-md bg-white/60 border border-blue-100 rounded-3xl shadow-2xl p-8 w-full max-w-lg mx-auto">
+        <h1 className="text-4xl font-extrabold text-blue-700 text-center mb-2 flex items-center justify-center gap-2">
+          <FaHeartbeat className="text-pink-400" /> BMR Calculator
+        </h1>
+        <p className="text-center text-gray-500 mb-8">Basal Metabolic Rate estimates your daily calorie needs at rest.</p>
+        <form className="flex flex-col gap-6" onSubmit={handleForm}>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-
-            <div className="mb-4">
-              <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="weight">
-                Weight (kg)
+            <div>
+              <label className="block text-blue-700 font-semibold mb-1" htmlFor="weight">
+                <span className="inline-flex items-center gap-2"><FaWeight /> Weight (kg)</span>
               </label>
               <input
                 type="number"
@@ -33,15 +34,14 @@ const CalculateBMR = () => {
                 onChange={(e) => setWeight(e.target.value)}
                 id="weight"
                 name="weight"
-
                 placeholder="Enter your weight in kilograms"
-                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                className="w-full px-4 py-2 rounded-lg border border-blue-200 bg-white/70 focus:outline-none focus:ring-2 focus:ring-blue-300 text-gray-700"
                 required
               />
             </div>
-            <div className="mb-4">
-              <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="height">
-                Height (cm)
+            <div>
+              <label className="block text-blue-700 font-semibold mb-1" htmlFor="height">
+                <span className="inline-flex items-center gap-2"><FaRulerVertical /> Height (cm)</span>
               </label>
               <input
                 type="number"
@@ -50,16 +50,15 @@ const CalculateBMR = () => {
                 onChange={(e) => setHeight(e.target.value)}
                 name="height"
                 placeholder="Enter your height in centimeters"
-                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                className="w-full px-4 py-2 rounded-lg border border-blue-200 bg-white/70 focus:outline-none focus:ring-2 focus:ring-blue-300 text-gray-700"
                 required
               />
             </div>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-
-            <div className="mb-4">
-              <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="height">
-                Age (years)
+            <div>
+              <label className="block text-blue-700 font-semibold mb-1" htmlFor="age">
+                <span className="inline-flex items-center gap-2"><FaUser /> Age (years)</span>
               </label>
               <input
                 type="number"
@@ -68,22 +67,21 @@ const CalculateBMR = () => {
                 onChange={(e) => setAge(e.target.value)}
                 name="age"
                 placeholder="Enter your Age in years"
-                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                className="w-full px-4 py-2 rounded-lg border border-blue-200 bg-white/70 focus:outline-none focus:ring-2 focus:ring-blue-300 text-gray-700"
                 required
               />
             </div>
-            <div className="mb-4">
-              <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="height">
-                Gender
+            <div>
+              <label className="block text-blue-700 font-semibold mb-1" htmlFor="gender">
+                <span className="inline-flex items-center gap-2"><FaVenusMars /> Gender</span>
               </label>
               <select
                 id="gender"
                 name="gender"
                 onChange={(e) => setGender(e.target.value)}
-                className="shadow border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                className="w-full px-4 py-2 rounded-lg border border-blue-200 bg-white/70 focus:outline-none focus:ring-2 focus:ring-blue-300 text-gray-700"
                 required
               >
-
                 <option value="male">Male</option>
                 <option value="female">Female</option>
               </select>
@@ -91,18 +89,18 @@ const CalculateBMR = () => {
           </div>
           <button
             type="submit"
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full"
+            className="w-full py-3 rounded-lg bg-gradient-to-r from-blue-500 to-green-400 text-white font-bold text-lg shadow hover:from-blue-600 hover:to-green-500 transition"
           >
             Calculate BMR
           </button>
         </form>
         {bmr && (
-          <div className="mt-6 text-center">
-            <h2 className="text-xl font-bold">Your BMR is: {bmr} kcal/day</h2>
+          <div className="mt-8 text-center animate-fade-in-up">
+            <h2 className="text-2xl font-bold text-blue-700 mb-2">Your BMR is: <span className="text-3xl text-green-600">{bmr} kcal/day</span></h2>
           </div>
         )}
       </div>
-    </>
+    </div>
   )
 }
 

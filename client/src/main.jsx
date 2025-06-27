@@ -16,6 +16,7 @@ import Login from './components/auth/Login.jsx'
 import Profile from './components/Profile.jsx'
 import EditProfile from './components/EditProfile.jsx'
 import Diet from './components/Diet.jsx'
+import About from './components/About.jsx'
 
 
 const router = createBrowserRouter([
@@ -25,6 +26,7 @@ const router = createBrowserRouter([
     children: [
       { path: '', element: <Hero /> },
       { path: '/profile', element: <Profile /> },
+      {path:'/about', element:<About/>},
       { path: '/editprofile', element: <EditProfile /> },
       { path: 'calculateBMI', element: <CalculateBMI /> },
       { path: 'calculateBMR', element: <CalculateBMR /> },

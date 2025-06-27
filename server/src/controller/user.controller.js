@@ -5,6 +5,8 @@ import { User } from "../models/user.model.js";
 import {Health} from "../models/health.model.js"
 import jwt from "jsonwebtoken";
 import { calculateAndSaveHealth } from "../utils/calculateAndSaveHealth.js";
+
+
 const generateAccessAndRefreshToken = async (userId) => {
   try {
     const user = await User.findById(userId);
@@ -148,6 +150,8 @@ const userLogin = asyncHandler(async (req, res) => {
   const options = {
     httpOnly: true,
     secure: false,
+    sameSite: "strict",
+  maxAge: 7 * 24 * 60 * 60 * 1000,
   };
 
   return res
@@ -218,6 +222,8 @@ const refereshAccessToken = asyncHandler(async (req, res) => {
     const options = {
       httpOnly: true,
       secure: true,
+      sameSite: "strict",
+  maxAge: 7 * 24 * 60 * 60 * 1000,
     };
 
     const { accessToken, newRefereshToken } =
