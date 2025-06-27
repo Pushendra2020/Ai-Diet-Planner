@@ -2,10 +2,9 @@ import { ApiError } from "../utils/ApiError.js";
 import ApiResponse from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { User } from "../models/user.model.js";
-import {Health} from "../models/health.model.js"
+import { Health } from "../models/health.model.js";
 import jwt from "jsonwebtoken";
 import { calculateAndSaveHealth } from "../utils/calculateAndSaveHealth.js";
-
 
 const generateAccessAndRefreshToken = async (userId) => {
   try {
@@ -38,8 +37,8 @@ const userRegister = asyncHandler(async (req, res) => {
     goal,
     dietPreferences,
     allergies,
-    mealsPerDay,     
-    mealBudgets
+    mealsPerDay,
+    mealBudgets,
   } = req.body;
 
   if (
@@ -54,8 +53,8 @@ const userRegister = asyncHandler(async (req, res) => {
       activityLevel,
       goal,
       dietPreferences,
-      mealsPerDay,     
-      mealBudgets
+      mealsPerDay,
+      mealBudgets,
     ].some((field) => field?.trim === "")
   ) {
     throw new ApiError(400, "All Fields are require");
@@ -81,8 +80,8 @@ const userRegister = asyncHandler(async (req, res) => {
     activityLevel,
     dietPreferences,
     allergies,
-    mealsPerDay,     
-    mealBudgets
+    mealsPerDay,
+    mealBudgets,
   });
 
   const userCreated = await User.findById(user._id).select(
@@ -149,9 +148,9 @@ const userLogin = asyncHandler(async (req, res) => {
 
   const options = {
     httpOnly: true,
-    secure: false,
+    secure: true,
     sameSite: "strict",
-  maxAge: 7 * 24 * 60 * 60 * 1000,
+    maxAge: 7 * 24 * 60 * 60 * 1000,
   };
 
   return res
@@ -186,7 +185,7 @@ const userLogOut = asyncHandler(async (req, res) => {
 
   const options = {
     httpOnly: true,
-    secure: false,
+    secure: true,
   };
 
   return res
@@ -223,7 +222,7 @@ const refereshAccessToken = asyncHandler(async (req, res) => {
       httpOnly: true,
       secure: true,
       sameSite: "strict",
-  maxAge: 7 * 24 * 60 * 60 * 1000,
+      maxAge: 7 * 24 * 60 * 60 * 1000,
     };
 
     const { accessToken, newRefereshToken } =
@@ -278,15 +277,15 @@ const updateAccountDetails = asyncHandler(async (req, res) => {
     goal,
     dietPreferences,
     allergies,
-    mealsPerDay,     
-    mealBudgets
+    mealsPerDay,
+    mealBudgets,
   } = req.body;
 
   // if (!fullname || !email) {
   //   throw new ApiError(400, "All fields are require");
   // }
 
-  const user =await User.findByIdAndUpdate(
+  const user = await User.findByIdAndUpdate(
     req.user?._id,
     {
       $set: {
@@ -298,8 +297,8 @@ const updateAccountDetails = asyncHandler(async (req, res) => {
         goal,
         dietPreferences,
         allergies,
-        mealsPerDay,     
-        mealBudgets
+        mealsPerDay,
+        mealBudgets,
       },
     },
     {
@@ -328,19 +327,14 @@ const updateAccountDetails = asyncHandler(async (req, res) => {
     );
 });
 
-const getHealthUser = asyncHandler(async(req,res)=>{
-  const userId=req.user?._id
-  const healthUser=await Health.find({userId})
+const getHealthUser = asyncHandler(async (req, res) => {
+  const userId = req.user?._id;
+  const healthUser = await Health.find({ userId });
 
-  return res.status(200).json(
-    new ApiResponse(
-      200,
-      {healthUser},
-      "Getting data of user Health"
-    )
-  )
-
-})
+  return res
+    .status(200)
+    .json(new ApiResponse(200, { healthUser }, "Getting data of user Health"));
+});
 
 export {
   userRegister,
@@ -350,5 +344,5 @@ export {
   getCurrentUser,
   changeCurrentPassword,
   updateAccountDetails,
-  getHealthUser
+  getHealthUser,
 };
