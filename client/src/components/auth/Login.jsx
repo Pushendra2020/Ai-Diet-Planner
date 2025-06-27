@@ -12,7 +12,7 @@ const Login = () => {
     const handleSubmit = async (e) => {
         e.preventDefault()
         try {
-            const response = await axios.post('http://localhost:5000/api/v2/users/login', { email, password }, {
+            const response = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/v2/users/login`, { email, password }, {
                 withCredentials: true,
             })
             console.log(response.data)

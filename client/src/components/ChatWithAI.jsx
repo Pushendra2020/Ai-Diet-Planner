@@ -20,7 +20,7 @@ const ChatWithAI = ({ userData, dietPlane, healthInfo, onPlanUpdate }) => {
     setAiLoading(true);
     try {
       if (mode === 'discuss') {
-        const res = await axios.post('http://localhost:5000/api/v2/diet/ask-ai', {
+        const res = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/v2/diet/ask-ai`, {
           question: userInput,
           user: userData,
           dietPlane,
@@ -28,7 +28,7 @@ const ChatWithAI = ({ userData, dietPlane, healthInfo, onPlanUpdate }) => {
         }, { withCredentials: true });
         setChat([...newChat, { sender: 'ai', text: res.data.answer, mode }]);
       } else if (mode === 'change') {
-        const res = await axios.post('http://localhost:5000/api/v2/diet/change-plan', {
+        const res = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/v2/diet/change-plan`, {
           changeRequest: userInput,
           user: userData,
           dietPlane,

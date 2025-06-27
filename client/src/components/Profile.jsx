@@ -15,7 +15,7 @@ const Profile = () => {
 
   const fetchUserHealthData = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/api/v2/users/userHealth', {
+      const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/v2/users/userHealth`, {
         withCredentials: true
       })
       if (response.data.success) {
@@ -146,7 +146,7 @@ const Profile = () => {
                 setPasswordMessage(null);
                 try {
                   const res = await axios.post(
-                    'http://localhost:5000/api/v2/users/changepassword',
+                    `${import.meta.env.VITE_BACKEND_URL}/api/v2/users/changepassword`,
                     { oldPassword, newPassword },
                     { withCredentials: true }
                   );
