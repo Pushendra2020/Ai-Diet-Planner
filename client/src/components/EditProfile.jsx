@@ -155,7 +155,7 @@ const EditProfile = () => {
                             <option value="INR">INR (₹)</option>
                             <option value="USD">USD ($)</option>
                         </select>
-                    </div>
+                    </div> 
 
                     <div>
                         <label className="block text-gray-700 font-semibold mb-2">
