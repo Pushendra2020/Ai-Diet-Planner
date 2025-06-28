@@ -60,8 +60,7 @@ const Hero = () => {
             {features.map((f, i) => (
               <li
                 key={i}
-                className={`flex items-center gap-3 text-green-900 text-base md:text-lg font-medium px-4 py-2 rounded-xl shadow hover:scale-[1.05] transition-transform duration-200 animate-fade-in-up animate-delay-${(i+1)*180}`}
-                style={{ filter: 'drop-shadow(0 0 12px #bbf7d0)' }}
+                className={`flex items-center gap-3 text-green-900 text-base md:text-lg font-medium px-4 py-2 rounded-xl shadow hover:scale-[1.05] transition-transform duration-200 animate-fade-in-up animate-delay-${(i+1)*180} hero-item-glow`}
               >
                 {f.icon}
                 <span>{f.text}</span>
@@ -71,63 +70,6 @@ const Hero = () => {
         </div>
       </div>
       {/* Custom CSS for glow, particles, and animation */}
-      <style>{`
-        @keyframes glow {
-          0%, 100% { filter: blur(32px) brightness(1.1) drop-shadow(0 0 40px #bbf7d0); }
-          50% { filter: blur(40px) brightness(1.3) drop-shadow(0 0 80px #a3e635); }
-        }
-        .animate-glow { animation: glow 3s ease-in-out infinite alternate; }
-        @keyframes glow2 {
-          0%, 100% { filter: blur(32px) brightness(1.1) drop-shadow(0 0 40px #a3e635); }
-          50% { filter: blur(40px) brightness(1.3) drop-shadow(0 0 80px #bbf7d0); }
-        }
-        .animate-glow2 { animation: glow2 3s ease-in-out infinite alternate; }
-        @keyframes glowText {
-          0%, 100% { text-shadow: 0 0 24px #bbf7d0, 0 0 48px #a3e635; }
-          50% { text-shadow: 0 0 48px #a3e635, 0 0 96px #bbf7d0; }
-        }
-        .animate-glow-text { animation: glowText 2.5s ease-in-out infinite alternate; }
-        .hero-glow-list { box-shadow: 0 0 32px 0 #bbf7d0cc, 0 2px 8px 0 #0001; }
-        /* Staggered fade-in for feature list */
-        .animate-delay-180 { animation-delay: 180ms; }
-        .animate-delay-360 { animation-delay: 360ms; }
-        .animate-delay-540 { animation-delay: 540ms; }
-        .animate-delay-720 { animation-delay: 720ms; }
-        /* Particle background */
-        .hero-particles {
-          position: absolute;
-          width: 100%;
-          height: 100%;
-          pointer-events: none;
-          z-index: 0;
-          background: radial-gradient(circle at 20% 30%, #bbf7d0 0.5px, transparent 1.5px),
-                      radial-gradient(circle at 80% 60%, #a3e635 0.5px, transparent 1.5px),
-                      radial-gradient(circle at 50% 80%, #bef264 0.5px, transparent 1.5px),
-                      radial-gradient(circle at 70% 20%, #bbf7d0 0.5px, transparent 1.5px);
-          background-size: 1200px 800px;
-          animation: particlesMove 12s linear infinite alternate;
-        }
-        @keyframes particlesMove {
-          0% { background-position: 0 0, 0 0, 0 0, 0 0; }
-          100% { background-position: 60px 40px, -40px 60px, 30px -30px, -60px -40px; }
-        }
-        .animate-glow-pulse {
-          animation: glowPulse 2.5s infinite alternate;
-        }
-        @keyframes glowPulse {
-          0% { opacity: 0.7; filter: blur(24px) brightness(1.1); }
-          100% { opacity: 1; filter: blur(32px) brightness(1.3); }
-        }
-        /* Animated gradient for h1 */
-        .animate-gradient-x {
-          background-size: 200% 200%;
-          animation: gradientX 4s ease-in-out infinite alternate;
-        }
-        @keyframes gradientX {
-          0% { background-position: 0% 50%; }
-          100% { background-position: 100% 50%; }
-        }
-      `}</style>
     </section>
   )
 }

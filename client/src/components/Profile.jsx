@@ -3,6 +3,7 @@ import { useSelector } from 'react-redux'
 import { NavLink } from 'react-router-dom'
 import axios from 'axios'
 import { FaMoneyBillWave, FaUser, FaHeartbeat, FaUtensils } from 'react-icons/fa'
+import toast from 'react-hot-toast'
 
 const Profile = () => {
   const [userHealth, setUserHealth] = useState(null)
@@ -144,6 +145,15 @@ const Profile = () => {
                 e.preventDefault();
                 setPasswordLoading(true);
                 setPasswordMessage(null);
+                
+                // Show loading toast
+                const loadingToast = toast.loading('Changing password...', {
+                  style: {
+                    background: '#1f2937',
+                    color: '#fff',
+                  },
+                });
+                
                 try {
                   const res = await axios.post(
                     `https://ai-diet-planner-dcal.onrender.com/api/v2/users/changepassword`,
@@ -151,14 +161,33 @@ const Profile = () => {
                     { withCredentials: true }
                   );
                   if (res.data.success) {
+                    // Dismiss loading toast and show success
+                    toast.dismiss(loadingToast);
+                    toast.success('Password changed successfully!', {
+                      duration: 3000,
+                    });
+                    
                     setPasswordMessage({ type: 'success', text: 'Password changed successfully!' });
                     setOldPassword('');
                     setNewPassword('');
                   } else {
+                    // Dismiss loading toast and show error
+                    toast.dismiss(loadingToast);
+                    toast.error(res.data.message || 'Failed to change password.', {
+                      duration: 4000,
+                    });
+                    
                     setPasswordMessage({ type: 'error', text: res.data.message || 'Failed to change password.' });
                   }
                 } catch (err) {
-                  setPasswordMessage({ type: 'error', text: err.response?.data?.message || 'Failed to change password.' });
+                  // Dismiss loading toast and show error
+                  toast.dismiss(loadingToast);
+                  const errorMessage = err.response?.data?.message || 'Failed to change password.';
+                  toast.error(errorMessage, {
+                    duration: 4000,
+                  });
+                  
+                  setPasswordMessage({ type: 'error', text: errorMessage });
                 }
                 setPasswordLoading(false);
               }}

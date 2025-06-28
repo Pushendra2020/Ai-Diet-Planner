@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import axios from 'axios'
 import { NavLink, useNavigate } from 'react-router-dom'
+import toast from 'react-hot-toast'
 
 const CreateAcc = () => {
     const [username, setUsername] = useState('');
@@ -17,20 +18,49 @@ const CreateAcc = () => {
     const [currency, setCurrency] = useState('INR');
     const [mealsPerDay, setMealsPerDay] = useState(3);
     const [mealBudgets, setMealBudgets] = useState([0, 0, 0]);
+    const [isLoading, setIsLoading] = useState(false);
 
     const navigate = useNavigate();
 
     const handleForm = async (e) => {
         e.preventDefault();
-        await axios.post(`https://ai-diet-planner-dcal.onrender.com/api/v2/users/register`, {
-            username, email, password, age, gender, height, weight, activityLevel, goal,
-            dietPreferences, allergies, mealsPerDay, mealBudgets, currency
-        }).then(function (response) {
-            console.log(response)
+        setIsLoading(true);
+        
+        // Show loading toast
+        const loadingToast = toast.loading('Creating your account...', {
+            style: {
+                background: '#1f2937',
+                color: '#fff',
+            },
+        });
+
+        try {
+            const response = await axios.post(`https://ai-diet-planner-dcal.onrender.com/api/v2/users/register`, {
+                username, email, password, age, gender, height, weight, activityLevel, goal,
+                dietPreferences, allergies, mealsPerDay, mealBudgets, currency
+            });
+            
+            // Dismiss loading toast and show success
+            toast.dismiss(loadingToast);
+            toast.success('Account created successfully! Please login.', {
+                duration: 4000,
+            });
+            
+            console.log(response);
             navigate('/login');
-        }).catch(function (error) {
-            console.log(error)
-        })
+        } catch (error) {
+            // Dismiss loading toast and show error
+            toast.dismiss(loadingToast);
+            
+            const errorMessage = error.response?.data?.message || 'Failed to create account. Please try again.';
+            toast.error(errorMessage, {
+                duration: 5000,
+            });
+            
+            console.log(error);
+        } finally {
+            setIsLoading(false);
+        }
     }
 
     useEffect(() => {
@@ -235,9 +265,21 @@ const CreateAcc = () => {
                     </div>
                     <button
                         type="submit"
-                        className="w-full mt-4 px-4 py-2 rounded bg-green-500 text-white font-semibold hover:bg-green-600 transition"
+                        disabled={isLoading}
+                        className={`w-full mt-4 px-4 py-2 rounded text-white font-semibold transition ${
+                            isLoading 
+                                ? 'bg-gray-400 cursor-not-allowed' 
+                                : 'bg-green-500 hover:bg-green-600'
+                        }`}
                     >
-                        Create Account
+                        {isLoading ? (
+                            <div className="flex items-center justify-center gap-2">
+                                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                                Creating Account...
+                            </div>
+                        ) : (
+                            'Create Account'
+                        )}
                     </button>
                 </form>
                 <p className="text-center text-gray-600">

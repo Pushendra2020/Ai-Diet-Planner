@@ -152,33 +152,6 @@ const Diet = () => {
                     </div>
                 </div>
             )}
-            {/* Custom Animations (Tailwind plugin or custom CSS required) */}
-            <style>{`
-                @keyframes fade-in-down { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: none; } }
-                .animate-fade-in-down { animation: fade-in-down 0.7s cubic-bezier(.4,0,.2,1) both; }
-                @keyframes fade-in-up { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: none; } }
-                .animate-fade-in-up { animation: fade-in-up 0.7s cubic-bezier(.4,0,.2,1) both; }
-                @keyframes fade-in-left { from { opacity: 0; transform: translateX(-30px); } to { opacity: 1; transform: none; } }
-                .animate-fade-in-left { animation: fade-in-left 0.7s cubic-bezier(.4,0,.2,1) both; }
-                @keyframes fade-in-right { from { opacity: 0; transform: translateX(30px); } to { opacity: 1; transform: none; } }
-                .animate-fade-in-right { animation: fade-in-right 0.7s cubic-bezier(.4,0,.2,1) both; }
-                @keyframes pop-in { 0% { opacity: 0; transform: scale(0.95); } 100% { opacity: 1; transform: scale(1); } }
-                .animate-pop-in { animation: pop-in 0.5s cubic-bezier(.4,0,.2,1) both; }
-                @keyframes pop { 0% { transform: scale(1); } 50% { transform: scale(1.12); } 100% { transform: scale(1); } }
-                .animate-pop { animation: pop 1.2s infinite cubic-bezier(.4,0,.2,1); }
-                @keyframes bounce-slow { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
-                .animate-bounce-slow { animation: bounce-slow 2.2s infinite; }
-                @keyframes bounce-x { 0%, 100% { transform: translateX(0); } 50% { transform: translateX(8px); } }
-                .animate-bounce-x { animation: bounce-x 1.8s infinite; }
-                @keyframes flicker { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
-                .animate-flicker { animation: flicker 1.2s infinite; }
-                @keyframes wiggle { 0%, 100% { transform: rotate(-6deg); } 50% { transform: rotate(6deg); } }
-                .animate-wiggle { animation: wiggle 1.5s infinite; }
-                @keyframes shake { 0%, 100% { transform: translateX(0); } 20%, 60% { transform: translateX(-8px); } 40%, 80% { transform: translateX(8px); } }
-                .animate-shake { animation: shake 0.5s; }
-                @keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
-                .animate-fade-in { animation: fade-in 1s both; }
-            `}</style>
         </div>
     )
 }

@@ -3,14 +3,27 @@ import axios from 'axios'
 import { NavLink, useNavigate } from 'react-router-dom'
 import { useDispatch } from 'react-redux'
 import { login } from '../../app/authSlice.js'
+import toast from 'react-hot-toast'
+
 const Login = () => {
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
+    const [isLoading, setIsLoading] = useState(false)
     const dispatch = useDispatch()
     const navigate = useNavigate()
 
     const handleSubmit = async (e) => {
         e.preventDefault()
+        setIsLoading(true)
+        
+        // Show loading toast
+        const loadingToast = toast.loading('Logging you in...', {
+            style: {
+                background: '#1f2937',
+                color: '#fff',
+            },
+        });
+
         try {
             const response = await axios.post(`https://ai-diet-planner-dcal.onrender.com/api/v2/users/login`, { email, password }, {
                 withCredentials: true,
@@ -22,10 +35,26 @@ const Login = () => {
 
                 dispatch(login({ userData: user }));
 
+                // Dismiss loading toast and show success
+                toast.dismiss(loadingToast);
+                toast.success(`Welcome back, ${user.username}!`, {
+                    duration: 3000,
+                });
+
                 navigate('/')
             }
         } catch (error) {
+            // Dismiss loading toast and show error
+            toast.dismiss(loadingToast);
+            
+            const errorMessage = error.response?.data?.message || 'Login failed. Please check your credentials.';
+            toast.error(errorMessage, {
+                duration: 4000,
+            });
+            
             console.error(error)
+        } finally {
+            setIsLoading(false)
         }
     }
 
@@ -57,9 +86,21 @@ const Login = () => {
                 </div>
                 <button
                     type="submit"
-                    className="w-full mt-4 px-4 py-2 rounded bg-green-500 text-white font-semibold hover:bg-green-600 transition"
+                    disabled={isLoading}
+                    className={`w-full mt-4 px-4 py-2 rounded text-white font-semibold transition ${
+                        isLoading 
+                            ? 'bg-gray-400 cursor-not-allowed' 
+                            : 'bg-green-500 hover:bg-green-600'
+                    }`}
                 >
-                    Login
+                    {isLoading ? (
+                        <div className="flex items-center justify-center gap-2">
+                            <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                            Logging In...
+                        </div>
+                    ) : (
+                        'Login'
+                    )}
                 </button>
             </form>
             <p className="text-center text-gray-600">
