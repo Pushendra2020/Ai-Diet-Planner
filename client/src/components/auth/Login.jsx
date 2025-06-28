@@ -59,29 +59,29 @@ const Login = () => {
     }
 
     return (
-        <div className="container mx-auto px-4 py-8 max-w-lg pt-20">
-            <h2 className="text-3xl font-bold text-green-600 mb-8 text-center">Login</h2>
-            <form onSubmit={handleSubmit} className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4 space-y-5">
+        <div className="container mx-auto px-4 py-8 max-w-lg pt-20 min-h-screen bg-white dark:bg-gray-900">
+            <h2 className="text-3xl font-bold text-green-600 dark:text-lime-300 mb-8 text-center">Login</h2>
+            <form onSubmit={handleSubmit} className="bg-white dark:bg-gray-900 shadow-md rounded px-8 pt-6 pb-8 mb-4 space-y-5 border border-green-100 dark:border-gray-800">
                 <div>
-                    <label className="block text-gray-700 font-semibold mb-2">Email:</label>
+                    <label className="block text-gray-700 dark:text-gray-200 font-semibold mb-2">Email:</label>
                     <input
                         type="email"
                         onChange={(e) => setEmail(e.target.value)}
                         value={email}
                         required
                         placeholder="Enter your email"
-                        className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-400"
+                        className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-400 dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700"
                     />
                 </div>
                 <div>
-                    <label className="block text-gray-700 font-semibold mb-2">Password:</label>
+                    <label className="block text-gray-700 dark:text-gray-200 font-semibold mb-2">Password:</label>
                     <input
                         type="password"
                         onChange={(e) => setPassword(e.target.value)}
                         value={password}
                         required
                         placeholder="Enter your password"
-                        className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-400"
+                        className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-400 dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700"
                     />
                 </div>
                 <button
@@ -90,7 +90,7 @@ const Login = () => {
                     className={`w-full mt-4 px-4 py-2 rounded text-white font-semibold transition ${
                         isLoading 
                             ? 'bg-gray-400 cursor-not-allowed' 
-                            : 'bg-green-500 hover:bg-green-600'
+                            : 'bg-green-500 hover:bg-green-600 dark:bg-lime-700 dark:hover:bg-lime-600'
                     }`}
                 >
                     {isLoading ? (
@@ -103,9 +103,9 @@ const Login = () => {
                     )}
                 </button>
             </form>
-            <p className="text-center text-gray-600">
+            <p className="text-center text-gray-600 dark:text-gray-300">
                 Don't have an account?
-                <NavLink to="/createAcc" className="text-green-600 hover:underline">
+                <NavLink to="/createAcc" className="text-green-600 dark:text-lime-400 hover:underline">
                     Register
                 </NavLink>
             </p>

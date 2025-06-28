@@ -81,82 +81,80 @@ const CreateAcc = () => {
 
     return (
         <>
-            <div className="container mx-auto px-4 pt-20 py-8 max-w-lg">
-                <h1 className="text-3xl font-bold text-green-600 mb-8 text-center">Create Your Account</h1>
-                <form onSubmit={handleForm} className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4 space-y-5">
+            <div className="container mx-auto px-4 pt-20 py-8 max-w-lg min-h-screen bg-white dark:bg-gray-900">
+                <h1 className="text-3xl font-bold text-green-600 dark:text-lime-300 mb-8 text-center">Create Your Account</h1>
+                <form onSubmit={handleForm} className="bg-white dark:bg-gray-900 shadow-md rounded px-8 pt-6 pb-8 mb-4 space-y-5 border border-green-100 dark:border-gray-800">
                     <div>
-                        <label className="block text-gray-700 font-semibold mb-2">Username:</label>
+                        <label className="block text-gray-700 dark:text-gray-200 font-semibold mb-2">Username:</label>
                         <input
                             type="text"
                             value={username}
                             placeholder='Enter Username'
                             onChange={(e) => setUsername(e.target.value)}
                             required
-                            className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-400"
+                            className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-400 dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700"
                         />
                     </div>
                     <div>
-                        <label className="block text-gray-700 font-semibold mb-2">Email:</label>
+                        <label className="block text-gray-700 dark:text-gray-200 font-semibold mb-2">Email:</label>
                         <input
                             type="email"
                             value={email}
                             placeholder='Enter Email'
                             onChange={(e) => setEmail(e.target.value)}
                             required
-                            className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-400"
+                            className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-400 dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700"
                         />
                     </div>
                     <div>
-                        <label className="block text-gray-700 font-semibold mb-2">Password:</label>
+                        <label className="block text-gray-700 dark:text-gray-200 font-semibold mb-2">Password:</label>
                         <input
                             type="password"
                             value={password}
                             placeholder='Enter Password'
                             onChange={(e) => setPassword(e.target.value)}
                             required
-                            className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-400"
+                            className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-400 dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700"
                         />
                     </div>
                     <div>
-                        <label className="block text-gray-700 font-semibold mb-2">Age:</label>
+                        <label className="block text-gray-700 dark:text-gray-200 font-semibold mb-2">Age:</label>
                         <input
                             type="number"
                             value={age}
                             placeholder='Enter Age'
                             min={0}
-
                             onChange={(e) => setAge(e.target.value)}
                             required
-                            className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-400"
+                            className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-400 dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700"
                         />
                     </div>
                     <div>
-                        <label className="block text-gray-700 font-semibold mb-2">Gender:</label>
+                        <label className="block text-gray-700 dark:text-gray-200 font-semibold mb-2">Gender:</label>
                         <select
                             value={gender}
                             required
                             onChange={(e) => setGender(e.target.value)}
-                            className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-400"
+                            className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-400 dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700"
                         >
                             <option value="Male">Male</option>
                             <option value="Female">Female</option>
                         </select>
                     </div>
                     <div>
-                        <label className="block text-gray-700 font-semibold mb-2">Height (cm):</label>
+                        <label className="block text-gray-700 dark:text-gray-200 font-semibold mb-2">Height (cm):</label>
                         <input
                             type="number"
                             value={height}
                             placeholder='Enter Height in CM'
                             min={0}
                             onChange={(e) => setHeight(e.target.value)}
-
                             required
-                            className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-400"
+                            className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-400 dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700"
                         />
                     </div>
                     <div>
-                        <label className="block text-gray-700 font-semibold mb-2">Weight (kg):</label>
+                        <label className="block text-gray-700 dark:text-gray-200 font-semibold mb-2">Weight (kg):</label>
                         <input
                             type="number"
                             value={weight}
@@ -164,16 +162,16 @@ const CreateAcc = () => {
                             min={0}
                             onChange={(e) => setWeight(e.target.value)}
                             required
-                            className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-400"
+                            className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-400 dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700"
                         />
                     </div>
                     <div>
-                        <label className="block text-gray-700 font-semibold mb-2">Activity Level:</label>
+                        <label className="block text-gray-700 dark:text-gray-200 font-semibold mb-2">Activity Level:</label>
                         <select
                             value={activityLevel}
                             onChange={(e) => setActivityLevel(e.target.value)}
                             required
-                            className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-400"
+                            className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-400 dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700"
                         >
                             <option value="sedentary">Sedentary Activity (No exercise)</option>
                             <option value="light">Light Activity</option>
@@ -183,49 +181,44 @@ const CreateAcc = () => {
                         </select>
                     </div>
                     <div>
-                        <label className="block text-gray-700 font-semibold mb-2">Goal:</label>
+                        <label className="block text-gray-700 dark:text-gray-200 font-semibold mb-2">Goal:</label>
                         <select
                             value={goal}
                             onChange={(e) => setGoal(e.target.value)}
                             required
-                            className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-400"
+                            className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-400 dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700"
                         >
                             <option value="gain">Gain (Gaining Your Weight)</option>
                             <option value="maintain">Maintain (Maintain Your Current Weight)</option>
                             <option value="lose">Lose (Losing Your Weight)</option>
                         </select>
                     </div>
-
                     <div>
-                        <label className="block text-gray-700 font-semibold mb-2">Meals Per Day:</label>
+                        <label className="block text-gray-700 dark:text-gray-200 font-semibold mb-2">Meals Per Day:</label>
                         <input
                             type="number"
                             min={1}
                             max={10}
                             value={mealsPerDay}
                             onChange={e => setMealsPerDay(Number(e.target.value))}
-                            className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-400"
+                            className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-400 dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700"
                             required
                         />
                     </div>
-
-
                     <div>
-                        <label className="block text-gray-700 font-semibold mb-2">Currency:</label>
+                        <label className="block text-gray-700 dark:text-gray-200 font-semibold mb-2">Currency:</label>
                         <select
                             value={currency}
                             onChange={e => setCurrency(e.target.value)}
-                            className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-400"
+                            className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-400 dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700"
                             required
                         >
                             <option value="INR">INR (₹)</option>
                             <option value="USD">USD ($)</option>
                         </select>
                     </div>
-
-
                     <div>
-                        <label className="block text-gray-700 font-semibold mb-2">
+                        <label className="block text-gray-700 dark:text-gray-200 font-semibold mb-2">
                             Meal Budgets (per meal, in {currency === 'INR' ? '₹' : '$'}):
                         </label>
                         {Array.from({ length: mealsPerDay }).map((_, idx) => (
@@ -241,20 +234,19 @@ const CreateAcc = () => {
                                         setMealBudgets(newBudgets);
                                     }}
                                     placeholder={`Meal ${idx + 1} Budget`}
-                                    className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-400"
+                                    className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-400 dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700"
                                     required
                                 />
                             </div>
                         ))}
                     </div>
-
                     <div>
-                        <label className="block text-gray-700 font-semibold mb-2">Diet Preferences:</label>
+                        <label className="block text-gray-700 dark:text-gray-200 font-semibold mb-2">Diet Preferences:</label>
                         <select
                             value={dietPreferences}
                             onChange={(e) => setDietPreferences(e.target.value)}
                             required
-                            className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-400"
+                            className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-400 dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700"
                         >
                             <option value="Vegetarian">Vegetarian</option>
                             <option value="Vegon">Vegan</option>
@@ -262,12 +254,12 @@ const CreateAcc = () => {
                         </select>
                     </div>
                     <div>
-                        <label className="block text-gray-700 font-semibold mb-2">Allergies:</label>
+                        <label className="block text-gray-700 dark:text-gray-200 font-semibold mb-2">Allergies:</label>
                         <input
                             type="text"
                             value={allergies.join(', ')}
                             onChange={(e) => setAllergies(e.target.value.split(',').map(item => item.trim()))}
-                            className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-400"
+                            className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-400 dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700"
                             placeholder="e.g. Egg, Beef"
                         />
                     </div>
@@ -277,7 +269,7 @@ const CreateAcc = () => {
                         className={`w-full mt-4 px-4 py-2 rounded text-white font-semibold transition ${
                             isLoading 
                                 ? 'bg-gray-400 cursor-not-allowed' 
-                                : 'bg-green-500 hover:bg-green-600'
+                                : 'bg-green-500 hover:bg-green-600 dark:bg-lime-700 dark:hover:bg-lime-600'
                         }`}
                     >
                         {isLoading ? (
@@ -290,9 +282,9 @@ const CreateAcc = () => {
                         )}
                     </button>
                 </form>
-                <p className="text-center text-gray-600">
+                <p className="text-center text-gray-600 dark:text-gray-300">
                     Already have an account?
-                    <NavLink to="/login" className="text-green-600 hover:underline">
+                    <NavLink to="/login" className="text-green-600 dark:text-lime-400 hover:underline">
                         Login
                     </NavLink>
                 </p>
