@@ -6,6 +6,7 @@ import { persistor } from './app/store.js'
 import { store } from './app/store.js'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import { Toaster } from 'react-hot-toast'
+import ThemeInit from './components/ThemeInit'
 import Layout from './components/Layout.jsx'
 import Hero from './components/Hero.jsx'
 import CalculateBMI from './components/Calculations/CalculateBMI.jsx'
@@ -43,6 +44,7 @@ const router = createBrowserRouter([
 createRoot(document.getElementById('root')).render(
   <Provider store={store}>
     <PersistGate loading={null} persistor={persistor}>
+      <ThemeInit />
       <RouterProvider router={router} />
       <Toaster 
         position="top-right"

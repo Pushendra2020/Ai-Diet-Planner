@@ -1,8 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react'
 import { NavLink, Link, useNavigate } from 'react-router-dom'
-import { useSelector } from "react-redux"
+import { useSelector, useDispatch } from "react-redux"
 import LogoutBnt from './auth/LogoutBnt';
-import { FaChevronDown, FaCalculator } from 'react-icons/fa';
+import { FaChevronDown, FaCalculator, FaMoon, FaSun } from 'react-icons/fa';
+import { toggleDarkMode } from '../app/authSlice';
 
 const calculationLinks = [
   { to: '/calculateBMI', label: 'Calculate BMI' },
@@ -17,6 +18,8 @@ const Navbar = () => {
   const dropdownRef = useRef(null);
   const navigate = useNavigate();
   const authStatus = useSelector((state) => state.auth.status);
+  const darkMode = useSelector((state) => state.auth.darkMode);
+  const dispatch = useDispatch();
 
   // Close dropdown on outside click
   useEffect(() => {
@@ -36,7 +39,7 @@ const Navbar = () => {
   }, [dropdownOpen]);
 
   return (
-    <nav className="backdrop-blur-md bg-white/70 border-b border-green-100 shadow-lg fixed w-full z-20 transition-all">
+    <nav className="backdrop-blur-md bg-white/70 dark:bg-gray-900/80 border-b border-green-100 shadow-lg fixed w-full z-20 transition-all">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16 items-center">
           {/* Logo */}
@@ -45,12 +48,12 @@ const Navbar = () => {
           </div>
           {/* Desktop Menu */}
           <div className="hidden md:flex space-x-8 items-center">
-            <NavLink to="/" className={({isActive}) => `text-gray-700 hover:text-green-600 font-semibold transition ${isActive ? 'text-green-600' : ''}`}>Home</NavLink>
-            <NavLink to="/about" className="text-gray-700 hover:text-green-600 font-semibold transition">About</NavLink>
+            <NavLink to="/" className={({isActive}) => `text-gray-700 dark:text-gray-200 hover:text-green-600 dark:hover:text-lime-400 font-semibold transition ${isActive ? 'text-green-600 dark:text-lime-400' : ''}`}>Home</NavLink>
+            <NavLink to="/about" className="text-gray-700 dark:text-gray-200 hover:text-green-600 dark:hover:text-lime-400 font-semibold transition">About</NavLink>
             {/* Custom Dropdown */}
             <div className="relative" ref={dropdownRef}>
               <button
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg font-semibold text-gray-700 hover:text-green-600 hover:bg-green-50 transition focus:outline-none focus:ring-2 focus:ring-green-200"
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg font-semibold text-gray-700 dark:text-gray-200 hover:text-green-600 dark:hover:text-lime-400 hover:bg-green-50 dark:hover:bg-gray-800 transition focus:outline-none focus:ring-2 focus:ring-green-200"
                 onClick={() => setDropdownOpen((v) => !v)}
                 type="button"
                 aria-haspopup="true"
@@ -59,12 +62,12 @@ const Navbar = () => {
                 <FaCalculator className="text-green-400" /> Calculation <FaChevronDown className={`transition-transform ${dropdownOpen ? 'rotate-180' : ''}`} />
               </button>
               {dropdownOpen && (
-                <div className="absolute left-0 mt-2 w-56 rounded-xl shadow-xl bg-white/90 border border-green-100 z-50 animate-fade-in-up">
+                <div className="absolute left-0 mt-2 w-56 rounded-xl shadow-xl bg-white/90 dark:bg-gray-900/95 border border-green-100 z-50 animate-fade-in-up">
                   {calculationLinks.map(link => (
                     <NavLink
                       key={link.to}
                       to={link.to}
-                      className={({isActive}) => `block px-5 py-3 text-gray-700 hover:bg-green-50 hover:text-green-600 font-medium rounded-xl transition ${isActive ? 'text-green-600 bg-green-50' : ''}`}
+                      className={({isActive}) => `block px-5 py-3 text-gray-700 dark:text-gray-200 hover:bg-green-50 dark:hover:bg-gray-800 hover:text-green-600 dark:hover:text-lime-400 font-medium rounded-xl transition ${isActive ? 'text-green-600 dark:text-lime-400 bg-green-50 dark:bg-gray-800' : ''}`}
                       onClick={() => setDropdownOpen(false)}
                     >
                       {link.label}
@@ -77,14 +80,22 @@ const Navbar = () => {
               <>
                 <NavLink
                   to='/profile'
-                  className={({isActive}) => `text-gray-700 hover:text-green-600 font-semibold transition ${isActive ? 'text-green-600' : ''}`}
+                  className={({isActive}) => `text-gray-700 dark:text-gray-200 hover:text-green-600 dark:hover:text-lime-400 font-semibold transition ${isActive ? 'text-green-600 dark:text-lime-400' : ''}`}
                 >Profile</NavLink>
                 <NavLink
                   to='/plan'
-                  className={({isActive}) => `text-gray-700 hover:text-green-600 font-semibold transition ${isActive ? 'text-green-600' : ''}`}
+                  className={({isActive}) => `text-gray-700 dark:text-gray-200 hover:text-green-600 dark:hover:text-lime-400 font-semibold transition ${isActive ? 'text-green-600 dark:text-lime-400' : ''}`}
                 >Diet Plan</NavLink>
               </>
             )}
+            {/* Dark mode toggle */}
+            <button
+              onClick={() => dispatch(toggleDarkMode())}
+              className="ml-2 p-2 rounded-full bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition"
+              aria-label="Toggle dark mode"
+            >
+              {darkMode ? <FaSun className="text-yellow-400" /> : <FaMoon className="text-gray-700" />}
+            </button>
           </div>
           {/* Auth Buttons */}
           <div className="hidden md:flex space-x-4">
@@ -101,12 +112,20 @@ const Navbar = () => {
           <div className="md:hidden flex items-center">
             <button
               onClick={() => setMenuOpen(!menuOpen)}
-              className="text-gray-700 hover:text-green-600 focus:outline-none"
+              className="text-gray-700 dark:text-gray-200 hover:text-green-600 dark:hover:text-lime-400 focus:outline-none"
               aria-label="Toggle menu"
             >
-              <svg className="h-7 w-7 text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="h-7 w-7 text-gray-800 dark:text-gray-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
               </svg>
+            </button>
+            {/* Dark mode toggle for mobile */}
+            <button
+              onClick={() => dispatch(toggleDarkMode())}
+              className="ml-2 p-2 rounded-full bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition"
+              aria-label="Toggle dark mode"
+            >
+              {darkMode ? <FaSun className="text-yellow-400" /> : <FaMoon className="text-gray-700" />}
             </button>
           </div>
         </div>
@@ -120,9 +139,9 @@ const Navbar = () => {
             onClick={() => setMenuOpen(false)}
           ></div>
           {/* Sidebar */}
-          <div className="fixed top-0 left-0 w-full max-w-xs min-h-screen bg-white/95 shadow-2xl flex flex-col p-7 space-y-2 animate-slide-in-left z-50 rounded-r-3xl border-r border-green-100 overflow-y-auto pt-16">
+          <div className="fixed top-0 left-0 w-full max-w-xs min-h-screen bg-white/95 dark:bg-gray-900 shadow-2xl flex flex-col p-7 space-y-2 animate-slide-in-left z-50 rounded-r-3xl border-r border-green-100 overflow-y-auto pt-16">
             <button
-              className="absolute top-4 right-4 text-gray-700 hover:text-green-600 z-10"
+              className="absolute top-4 right-4 text-gray-700 dark:text-gray-200 hover:text-green-600 dark:hover:text-lime-400 z-10"
               onClick={() => setMenuOpen(false)}
               aria-label="Close menu"
             >
@@ -130,10 +149,18 @@ const Navbar = () => {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
+            {/* Dark mode toggle in sidebar */}
+            <button
+              onClick={() => dispatch(toggleDarkMode())}
+              className="mb-4 p-2 rounded-full bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition self-end"
+              aria-label="Toggle dark mode"
+            >
+              {darkMode ? <FaSun className="text-yellow-400" /> : <FaMoon className="text-gray-700" />}
+            </button>
             <NavLink
               to="/"
               className={({ isActive }) =>
-                `block px-6 py-4 rounded-lg text-gray-700 font-semibold transition hover:bg-green-100 hover:text-green-600 ${isActive ? 'text-green-600 bg-green-50' : ''}`
+                `block px-6 py-4 rounded-lg text-gray-700 dark:text-gray-200 font-semibold transition hover:bg-green-100 dark:hover:bg-gray-800 hover:text-green-600 dark:hover:text-lime-400 ${isActive ? 'text-green-600 dark:text-lime-400 bg-green-50 dark:bg-gray-800' : ''}`
               }
               onClick={() => setMenuOpen(false)}
               end
@@ -143,7 +170,7 @@ const Navbar = () => {
             <NavLink
               to="/about"
               className={({ isActive }) =>
-                `block px-6 py-4 rounded-lg text-gray-700 font-semibold transition hover:bg-green-100 hover:text-green-600 ${isActive ? 'text-green-600 bg-green-50' : ''}`
+                `block px-6 py-4 rounded-lg text-gray-700 dark:text-gray-200 font-semibold transition hover:bg-green-100 dark:hover:bg-gray-800 hover:text-green-600 dark:hover:text-lime-400 ${isActive ? 'text-green-600 dark:text-lime-400 bg-green-50 dark:bg-gray-800' : ''}`
               }
               onClick={() => setMenuOpen(false)}
             >
@@ -154,29 +181,29 @@ const Navbar = () => {
                 <NavLink
                   to='/profile'
                   className={({ isActive }) =>
-                    `block px-6 py-4 rounded-lg text-gray-700 font-semibold transition hover:bg-green-100 hover:text-green-600 ${isActive ? 'text-green-600 bg-green-50' : ''}`
+                    `block px-6 py-4 rounded-lg text-gray-700 dark:text-gray-200 font-semibold transition hover:bg-green-100 dark:hover:bg-gray-800 hover:text-green-600 dark:hover:text-lime-400 ${isActive ? 'text-green-600 dark:text-lime-400 bg-green-50 dark:bg-gray-800' : ''}`
                   }
                   onClick={() => setMenuOpen(false)}
                 >Profile</NavLink>
                 <NavLink
                   to='/plan'
                   className={({ isActive }) =>
-                    `block px-6 py-4 rounded-lg text-gray-700 font-semibold transition hover:bg-green-100 hover:text-green-600 ${isActive ? 'text-green-600 bg-green-50' : ''}`
+                    `block px-6 py-4 rounded-lg text-gray-700 dark:text-gray-200 font-semibold transition hover:bg-green-100 dark:hover:bg-gray-800 hover:text-green-600 dark:hover:text-lime-400 ${isActive ? 'text-green-600 dark:text-lime-400 bg-green-50 dark:bg-gray-800' : ''}`
                   }
                   onClick={() => setMenuOpen(false)}
                 >Diet Plan</NavLink>
               </>
             )}
-            <div className="border-t border-gray-200 my-2"></div>
+            <div className="border-t border-gray-200 dark:border-gray-700 my-2"></div>
             {/* Calculation Dropdown for Mobile */}
             <div className="mb-2">
-              <div className="flex items-center gap-2 text-gray-700 font-semibold mb-1"><FaCalculator className="text-green-400" /> Calculation</div>
+              <div className="flex items-center gap-2 text-gray-700 dark:text-gray-200 font-semibold mb-1"><FaCalculator className="text-green-400" /> Calculation</div>
               <div className="flex flex-col gap-1">
                 {calculationLinks.map(link => (
                   <NavLink
                     key={link.to}
                     to={link.to}
-                    className={({isActive}) => `block px-6 py-4 rounded-lg text-gray-700 font-medium transition hover:bg-green-50 hover:text-green-600 ${isActive ? 'text-green-600 bg-green-50' : ''}`}
+                    className={({isActive}) => `block px-6 py-4 rounded-lg text-gray-700 dark:text-gray-200 font-medium transition hover:bg-green-50 dark:hover:bg-gray-800 hover:text-green-600 dark:hover:text-lime-400 ${isActive ? 'text-green-600 dark:text-lime-400 bg-green-50 dark:bg-gray-800' : ''}`}
                     onClick={() => setMenuOpen(false)}
                   >
                     {link.label}
@@ -184,11 +211,11 @@ const Navbar = () => {
                 ))}
               </div>
             </div>
-            <div className="border-t border-gray-200 my-2"></div>
+            <div className="border-t border-gray-200 dark:border-gray-700 my-2"></div>
             {!authStatus ? (
               <>
                 <Link to="/login" className="px-6 py-4 rounded-lg bg-gradient-to-r from-green-500 to-lime-400 text-white font-semibold shadow hover:from-green-600 hover:to-lime-500 transition block text-center">Log In</Link>
-                <Link className="px-6 py-4 rounded-lg border border-green-500 text-green-600 font-semibold hover:bg-green-50 transition block text-center" to='/createAcc'>Sign Up</Link>
+                <Link className="px-6 py-4 rounded-lg border border-green-500 text-green-600 font-semibold hover:bg-green-50 dark:hover:bg-gray-800 transition block text-center" to='/createAcc'>Sign Up</Link>
               </>
             ) : (
               <LogoutBnt />
