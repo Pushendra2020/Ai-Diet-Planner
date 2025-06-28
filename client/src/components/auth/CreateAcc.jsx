@@ -24,6 +24,14 @@ const CreateAcc = () => {
 
     const handleForm = async (e) => {
         e.preventDefault();
+        // Stricter email validation
+        const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+        if (!emailPattern.test(email)) {
+            toast.error('Please enter a valid email address.', {
+                duration: 4000,
+            });
+            return;
+        }
         setIsLoading(true);
         
         // Show loading toast
