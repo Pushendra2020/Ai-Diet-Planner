@@ -41,19 +41,19 @@ const features = [
 
 const About = () => {
     return (
-        <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-100 py-20 px-4 flex flex-col items-center">
-            <div className="max-w-3xl w-full mx-auto text-center mb-12">
-                <h1 className="text-5xl font-extrabold bg-gradient-to-r from-green-500 to-lime-400 bg-clip-text text-transparent mb-4 drop-shadow-lg">Welcome to ProDiet!</h1>
-                <p className="text-lg md:text-xl text-gray-600 mb-6">Your all-in-one, AI-powered diet and health companion. Discover how ProDiet can help you eat smarter, live healthier, and reach your goals—effortlessly.</p>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl w-full">
-                {features.map((f, i) => (
-                    <div key={i} className="backdrop-blur-md bg-white/70 border border-green-100 rounded-2xl shadow-xl p-7 flex flex-col items-center text-center hover:scale-105 hover:shadow-2xl transition-transform duration-300">
-                        <div className="mb-3">{f.icon}</div>
-                        <h2 className="text-2xl font-bold text-green-700 mb-2">{f.title}</h2>
-                        <p className="text-gray-600 text-base md:text-lg">{f.desc}</p>
-                    </div>
-                ))}
+        <div className="min-h-screen bg-white dark:bg-gray-900 px-4 py-12">
+            <div className="max-w-3xl mx-auto bg-white dark:bg-gray-900 rounded-2xl shadow-lg border border-green-100 dark:border-gray-800 p-8">
+                <h1 className="text-3xl font-bold text-green-700 dark:text-lime-300 mb-6">About Pro Diet</h1>
+                <p className="text-gray-700 dark:text-gray-200 mb-4">Your all-in-one, AI-powered diet and health companion. Discover how ProDiet can help you eat smarter, live healthier, and reach your goals—effortlessly.</p>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl w-full">
+                    {features.map((f, i) => (
+                        <div key={i} className="backdrop-blur-md bg-white/70 border border-green-100 rounded-2xl shadow-xl p-7 flex flex-col items-center text-center hover:scale-105 hover:shadow-2xl transition-transform duration-300">
+                            <div className="mb-3">{f.icon}</div>
+                            <h2 className="text-2xl font-bold text-green-700 dark:text-lime-300 mb-2">{f.title}</h2>
+                            <p className="text-gray-600 text-base md:text-lg dark:text-gray-200">{f.desc}</p>
+                        </div>
+                    ))}
+                </div>
             </div>
         </div>
     );

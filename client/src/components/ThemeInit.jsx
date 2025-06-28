@@ -12,11 +12,11 @@ export default function ThemeInit() {
   const dispatch = useDispatch();
   const darkMode = useSelector(state => state.auth.darkMode);
 
-  // On mount, initialize theme from localStorage or system
+  // On mount, initialize theme from localStorage or set dark as default
   useEffect(() => {
     let theme = localStorage.getItem(THEME_KEY);
     if (theme === null) {
-      theme = getSystemPrefersDark() ? 'dark' : 'light';
+      theme = 'dark'; // Set dark as default
       localStorage.setItem(THEME_KEY, theme);
     }
     dispatch(setDarkMode(theme === 'dark'));

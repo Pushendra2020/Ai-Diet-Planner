@@ -11,7 +11,7 @@ const CalculateCalorieNeeds = () => {
     setCalorieNeeds(calorieNeeds_Value);
   }
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-50 to-blue-100 py-10">
+    <div className="min-h-screen bg-white dark:bg-gray-900 px-4 py-12">
       <div className="backdrop-blur-md bg-white/60 border border-blue-100 rounded-3xl shadow-2xl p-8 w-full max-w-lg mx-auto">
         <h1 className="text-4xl font-extrabold text-blue-700 text-center mb-2 flex items-center justify-center gap-2">
           <FaFire className="text-orange-400" /> Calorie Needs Calculator
