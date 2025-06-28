@@ -4,6 +4,7 @@ import { NavLink, useNavigate } from 'react-router-dom'
 import { useDispatch } from 'react-redux'
 import { login } from '../../app/authSlice.js'
 import toast from 'react-hot-toast'
+import { FaEnvelope, FaLock, FaSignInAlt, FaUserPlus } from 'react-icons/fa'
 
 const Login = () => {
     const [email, setEmail] = useState('')
@@ -59,56 +60,82 @@ const Login = () => {
     }
 
     return (
-        <div className="container mx-auto px-4 py-8 max-w-lg pt-20 min-h-screen bg-white dark:bg-gray-900">
-            <h2 className="text-3xl font-bold text-green-600 dark:text-lime-300 mb-8 text-center">Login</h2>
-            <form onSubmit={handleSubmit} className="bg-white dark:bg-gray-900 shadow-md rounded px-8 pt-6 pb-8 mb-4 space-y-5 border border-green-100 dark:border-gray-800">
-                <div>
-                    <label className="block text-gray-700 dark:text-gray-200 font-semibold mb-2">Email:</label>
-                    <input
-                        type="email"
-                        onChange={(e) => setEmail(e.target.value)}
-                        value={email}
-                        required
-                        placeholder="Enter your email"
-                        className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-400 dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700"
-                    />
+        <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-lime-100 dark:from-gray-900 dark:via-gray-950 dark:to-gray-900 pt-24 pb-10 px-4">
+            <div className="max-w-md mx-auto">
+                <div className="text-center mb-8">
+                    <h1 className="text-4xl font-extrabold bg-gradient-to-r from-green-500 to-lime-400 dark:from-lime-400 dark:to-green-500 bg-clip-text text-transparent mb-4">
+                        Welcome Back!
+                    </h1>
+                    <p className="text-gray-600 dark:text-gray-300 text-lg">
+                        Sign in to continue your nutrition journey
+                    </p>
                 </div>
-                <div>
-                    <label className="block text-gray-700 dark:text-gray-200 font-semibold mb-2">Password:</label>
-                    <input
-                        type="password"
-                        onChange={(e) => setPassword(e.target.value)}
-                        value={password}
-                        required
-                        placeholder="Enter your password"
-                        className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-400 dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700"
-                    />
+                
+                <form onSubmit={handleSubmit} className="backdrop-blur-md bg-white/70 dark:bg-gray-900/80 border border-green-100 dark:border-gray-800 rounded-3xl shadow-2xl p-8 space-y-6">
+                    <div>
+                        <label className="block text-gray-700 dark:text-gray-200 font-semibold mb-2 flex items-center gap-2">
+                            <FaEnvelope className="text-green-600 dark:text-lime-400" /> Email Address
+                        </label>
+                        <input
+                            type="email"
+                            onChange={(e) => setEmail(e.target.value)}
+                            value={email}
+                            required
+                            placeholder="Enter your email address"
+                            className="w-full px-4 py-3 border border-green-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400 dark:focus:ring-lime-400 bg-white/70 dark:bg-gray-800/70 text-gray-700 dark:text-gray-200 placeholder-gray-500 dark:placeholder-gray-400"
+                        />
+                    </div>
+                    
+                    <div>
+                        <label className="block text-gray-700 dark:text-gray-200 font-semibold mb-2 flex items-center gap-2">
+                            <FaLock className="text-green-600 dark:text-lime-400" /> Password
+                        </label>
+                        <input
+                            type="password"
+                            onChange={(e) => setPassword(e.target.value)}
+                            value={password}
+                            required
+                            placeholder="Enter your password"
+                            className="w-full px-4 py-3 border border-green-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400 dark:focus:ring-lime-400 bg-white/70 dark:bg-gray-800/70 text-gray-700 dark:text-gray-200 placeholder-gray-500 dark:placeholder-gray-400"
+                        />
+                    </div>
+                    
+                    <button
+                        type="submit"
+                        disabled={isLoading}
+                        className={`w-full mt-6 px-6 py-4 rounded-xl text-white font-bold text-lg shadow-lg transition-all duration-300 flex items-center justify-center gap-3 ${
+                            isLoading 
+                                ? 'bg-gray-400 cursor-not-allowed' 
+                                : 'bg-gradient-to-r from-green-500 to-lime-400 dark:from-lime-600 dark:to-green-600 hover:from-green-600 hover:to-lime-500 dark:hover:from-lime-500 dark:hover:to-green-500 hover:shadow-xl hover:scale-[1.02]'
+                        }`}
+                    >
+                        {isLoading ? (
+                            <>
+                                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                                Signing In...
+                            </>
+                        ) : (
+                            <>
+                                <FaSignInAlt />
+                                Sign In
+                            </>
+                        )}
+                    </button>
+                </form>
+                
+                <div className="mt-8 text-center">
+                    <p className="text-gray-600 dark:text-gray-300 mb-4">
+                        Don't have an account yet?
+                    </p>
+                    <NavLink 
+                        to="/createAcc" 
+                        className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-lime-500 to-green-500 dark:from-green-600 dark:to-lime-600 hover:from-lime-600 hover:to-green-600 dark:hover:from-green-500 dark:hover:to-lime-500 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
+                    >
+                        <FaUserPlus />
+                        Create Account
+                    </NavLink>
                 </div>
-                <button
-                    type="submit"
-                    disabled={isLoading}
-                    className={`w-full mt-4 px-4 py-2 rounded text-white font-semibold transition ${
-                        isLoading 
-                            ? 'bg-gray-400 cursor-not-allowed' 
-                            : 'bg-green-500 hover:bg-green-600 dark:bg-lime-700 dark:hover:bg-lime-600'
-                    }`}
-                >
-                    {isLoading ? (
-                        <div className="flex items-center justify-center gap-2">
-                            <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                            Logging In...
-                        </div>
-                    ) : (
-                        'Login'
-                    )}
-                </button>
-            </form>
-            <p className="text-center text-gray-600 dark:text-gray-300">
-                Don't have an account?
-                <NavLink to="/createAcc" className="text-green-600 dark:text-lime-400 hover:underline">
-                    Register
-                </NavLink>
-            </p>
+            </div>
         </div>
     )
 }
