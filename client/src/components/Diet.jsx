@@ -11,6 +11,12 @@ const Diet = () => {
     const [healthInfo, setHealthInfo] = useState(null)
     const [chatOpen, setChatOpen] = useState(false)
     const userData = useSelector((state) => state.auth.userData)
+    const [refreshKey, setRefreshKey] = useState(0);
+
+const handlePlanUpdate = (updatedPlan) => {
+        setDietPlan(updatedPlan); // update immediately
+        setRefreshKey(prev => prev + 1); // trigger useEffect if you want to re-fetch
+    };
 
     const fetchDietPlan = async () => {
         setLoading(true)
@@ -43,7 +49,7 @@ const Diet = () => {
         fetchDietPlan();
         fetchHealthInfo();
         document.title = 'Diet Plan'
-    }, [])
+    }, [refreshKey])
 
     // Determine currency symbol
     const currency = dietPlan?.currency || 'INR';
@@ -148,7 +154,7 @@ const Diet = () => {
                         >
                             <FaTimes />
                         </button>
-                        <ChatWithAI userData={userData} dietPlane={dietPlan} healthInfo={healthInfo} />
+                        <ChatWithAI userData={userData} dietPlane={dietPlan} healthInfo={healthInfo} onPlanUpdate={handlePlanUpdate} />
                     </div>
                 </div>
             )}
