@@ -6,7 +6,6 @@ function areCookiesEnabled() {
   try {
     document.cookie = 'cookietest=1';
     const cookiesEnabled = document.cookie.indexOf('cookietest=') !== -1;
-    // Clean up
     document.cookie = 'cookietest=1; expires=Thu, 01-Jan-1970 00:00:01 GMT';
     return cookiesEnabled;
   } catch (e) {
@@ -14,7 +13,8 @@ function areCookiesEnabled() {
   }
 }
 
-const CookieConsent = () => {
+
+const CookieConsent = ({ children }) => {
   const [showBanner, setShowBanner] = useState(false);
 
   useEffect(() => {
@@ -29,21 +29,26 @@ const CookieConsent = () => {
     setShowBanner(false);
   };
 
-  if (!showBanner) return null;
-
-  return (
-    <div className="fixed bottom-0 left-0 w-full z-50 bg-gray-900 text-white px-4 py-4 flex flex-col md:flex-row items-center justify-between shadow-lg animate-slide-in-left">
-      <div className="mb-2 md:mb-0 text-center md:text-left">
-        <span className="font-semibold">Cookie Notice:</span> This site uses cookies to enhance your experience. By continuing, you agree to our use of cookies. If cookies are blocked, some features may not work properly.
+  if (showBanner) {
+    return (
+      <div className="fixed inset-0 z-50 bg-gray-900 bg-opacity-90 flex flex-col items-center justify-center">
+        <div className="bg-white text-gray-900 rounded-lg shadow-lg p-8 max-w-lg w-full text-center">
+          <span className="font-semibold text-lg">Cookie Notice</span>
+          <p className="mt-4 mb-6">
+            This site uses cookies to enhance your experience. By continuing, you agree to our use of cookies. If cookies are blocked, some features may not work properly.
+          </p>
+          <button
+            onClick={handleAccept}
+            className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-6 rounded-full shadow transition"
+          >
+            Accept
+          </button>
+        </div>
       </div>
-      <button
-        onClick={handleAccept}
-        className="mt-2 md:mt-0 bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-6 rounded-full shadow transition"
-      >
-        Accept
-      </button>
-    </div>
-  );
+    );
+  }
+
+  return children || null;
 };
 
 export default CookieConsent; 
