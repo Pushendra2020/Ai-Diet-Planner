@@ -16,7 +16,7 @@ const Profile = () => {
 
   const fetchUserHealthData = async () => {
     try {
-      const response = await axios.get(`https://ai-diet-planner-dcal.onrender.com/api/v2/users/userHealth`, {
+      const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/v2/users/userHealth`, {
         withCredentials: true
       })
       if (response.data.success) {
@@ -156,7 +156,7 @@ const Profile = () => {
                 
                 try {
                   const res = await axios.post(
-                    `https://ai-diet-planner-dcal.onrender.com/api/v2/users/changepassword`,
+                    `${import.meta.env.VITE_API_URL}/api/v2/users/changepassword`,
                     { oldPassword, newPassword },
                     { withCredentials: true }
                   );

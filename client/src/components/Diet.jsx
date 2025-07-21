@@ -22,7 +22,7 @@ const handlePlanUpdate = (updatedPlan) => {
         setLoading(true)
         setError(null)
         try {
-            const response = await axios.get(`https://ai-diet-planner-dcal.onrender.com/api/v2/diet/generate`,  {
+            const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/v2/diet/generate`,  {
                 withCredentials: true,
             });
             setDietPlan(response.data.data.newPlan)
@@ -36,7 +36,7 @@ const handlePlanUpdate = (updatedPlan) => {
 
     const fetchHealthInfo = async () => {
         try {
-            const response = await axios.get(`https://ai-diet-planner-dcal.onrender.com/api/v2/users/userHealth`, { withCredentials: true })
+            const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/v2/users/userHealth`, { withCredentials: true })
             if (response.data.success) {
                 setHealthInfo(response.data.data.healthUser[0])
             }
@@ -135,7 +135,7 @@ const handlePlanUpdate = (updatedPlan) => {
                     <div className="text-gray-600 dark:text-gray-300 mt-4 text-center animate-fade-in">No diet plan available.</div>
                 )}
             </div>
-            {/* Floating Chat Button */}
+          
             <button
                 className="fixed bottom-8 right-8 z-50 bg-green-500 dark:bg-lime-700 hover:bg-green-600 dark:hover:bg-lime-600 text-white rounded-full shadow-lg w-16 h-16 flex items-center justify-center text-3xl transition-all duration-200"
                 onClick={() => setChatOpen(true)}

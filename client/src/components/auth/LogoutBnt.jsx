@@ -10,7 +10,7 @@ const navigate = useNavigate()
 const handleClick = async () => {
   try {
     await axios.post(
-      `https://ai-diet-planner-dcal.onrender.com/api/v2/users/logout`,
+      `${import.meta.env.VITE_API_URL}/api/v2/users/logout`,
       {}, // no body needed for logout
       {
         withCredentials: true, // correct place to set this

@@ -26,7 +26,7 @@ const Login = () => {
         });
 
         try {
-            const response = await axios.post(`https://ai-diet-planner-dcal.onrender.com/api/v2/users/login`, { email, password }, {
+            const response = await axios.post(`${import.meta.env.VITE_API_URL}/api/v2/users/login`, { email, password }, {
                 withCredentials: true,
             })
             console.log(response.data)

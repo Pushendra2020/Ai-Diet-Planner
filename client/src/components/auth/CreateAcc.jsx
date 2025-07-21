@@ -44,7 +44,7 @@ const CreateAcc = () => {
         });
 
         try {
-            const response = await axios.post(`https://ai-diet-planner-dcal.onrender.com/api/v2/users/register`, {
+            const response = await axios.post(`${import.meta.env.VITE_API_URL}/api/v2/users/register`, {
                 username, email, password, age, gender, height, weight, activityLevel, goal,
                 dietPreferences, allergies, mealsPerDay, mealBudgets, currency
             });

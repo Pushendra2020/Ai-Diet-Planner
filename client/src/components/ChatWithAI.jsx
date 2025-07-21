@@ -3,13 +3,13 @@ import axios from 'axios';
 import { FaRobot, FaUser, FaSyncAlt, FaComments } from 'react-icons/fa';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-// Make sure @tailwindcss/typography is installed and added to tailwind.config.js plugins
+
 
 const ChatWithAI = ({ userData, dietPlane, healthInfo, onPlanUpdate }) => {
   const [chat, setChat] = useState([]);
   const [userInput, setUserInput] = useState('');
   const [aiLoading, setAiLoading] = useState(false);
-  const [mode, setMode] = useState('discuss'); // 'discuss' or 'change'
+  const [mode, setMode] = useState('discuss');
   const chatEndRef = useRef(null);
 
   const handleSend = async () => {
@@ -20,7 +20,7 @@ const ChatWithAI = ({ userData, dietPlane, healthInfo, onPlanUpdate }) => {
     setAiLoading(true);
     try {
       if (mode === 'discuss') {
-        const res = await axios.post(`https://ai-diet-planner-dcal.onrender.com/api/v2/diet/ask-ai`, {
+        const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/v2/diet/ask-ai`, {
           question: userInput,
           user: userData,
           dietPlane,
@@ -28,7 +28,7 @@ const ChatWithAI = ({ userData, dietPlane, healthInfo, onPlanUpdate }) => {
         }, { withCredentials: true });
         setChat([...newChat, { sender: 'ai', text: res.data.answer, mode }]);
       } else if (mode === 'change') {
-        const res = await axios.post(`https://ai-diet-planner-dcal.onrender.com/api/v2/diet/change-plan`, {
+        const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/v2/diet/change-plan`, {
           changeRequest: userInput,
           user: userData,
           dietPlane,
@@ -46,7 +46,7 @@ const ChatWithAI = ({ userData, dietPlane, healthInfo, onPlanUpdate }) => {
     }
   };
 
-  // Auto-scroll to bottom on new message
+
   useEffect(() => {
     if (chatEndRef.current) {
       chatEndRef.current.scrollIntoView({ behavior: 'smooth' });
@@ -55,7 +55,7 @@ const ChatWithAI = ({ userData, dietPlane, healthInfo, onPlanUpdate }) => {
 
   return (
     <div className="flex flex-col h-[32rem] max-h-[80vh]">
-      {/* Mode Switcher */}
+ 
       <div className="flex gap-2 mb-2">
         <button
           className={`flex items-center gap-2 px-4 py-2 rounded-full font-semibold shadow transition border ${mode === 'discuss' ? 'bg-green-500 dark:bg-lime-600 text-white border-green-500 dark:border-lime-600' : 'bg-white dark:bg-gray-800 text-green-700 dark:text-lime-300 border-green-200 dark:border-gray-700 hover:bg-green-50 dark:hover:bg-gray-700'}`}
