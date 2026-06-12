@@ -39,7 +39,7 @@ const ChatWithAI = ({ userData, dietPlane, healthInfo, onPlanUpdate }) => {
           onPlanUpdate(res.data.updatedPlan);
         }
       }
-    } catch (e) {
+    } catch {
       setChat([...newChat, { sender: 'ai', text: 'Sorry, there was an error processing your request.' }]);
     } finally {
       setAiLoading(false);
@@ -55,7 +55,11 @@ const ChatWithAI = ({ userData, dietPlane, healthInfo, onPlanUpdate }) => {
 
   return (
     <div className="flex flex-col h-[32rem] max-h-[80vh]">
- 
+      <div className="mb-3 pr-10">
+        <h2 className="text-xl font-bold text-gray-900 dark:text-white">Weekly Diet Assistant</h2>
+        <p className="text-sm text-gray-500 dark:text-gray-400">Ask about any day, or request a change to your 7-day plan.</p>
+      </div>
+
       <div className="flex gap-2 mb-2">
         <button
           className={`flex items-center gap-2 px-4 py-2 rounded-full font-semibold shadow transition border ${mode === 'discuss' ? 'bg-green-500 dark:bg-lime-600 text-white border-green-500 dark:border-lime-600' : 'bg-white dark:bg-gray-800 text-green-700 dark:text-lime-300 border-green-200 dark:border-gray-700 hover:bg-green-50 dark:hover:bg-gray-700'}`}

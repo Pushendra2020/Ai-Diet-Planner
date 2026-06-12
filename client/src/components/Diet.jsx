@@ -1,165 +1,268 @@
-import React, { useEffect, useState } from 'react'
-import axios from 'axios'
-import { useSelector } from 'react-redux'
-import { FaUtensils, FaLeaf, FaFireAlt, FaMoneyBillWave, FaBalanceScale, FaCircle, FaRobot, FaTimes } from 'react-icons/fa';
+import { useEffect, useState } from 'react';
+import axios from 'axios';
+import { useSelector } from 'react-redux';
+import {
+  FaBalanceScale,
+  FaChevronLeft,
+  FaChevronRight,
+  FaFireAlt,
+  FaLeaf,
+  FaMoneyBillWave,
+  FaRobot,
+  FaTimes,
+  FaUtensils,
+} from 'react-icons/fa';
 import ChatWithAI from './ChatWithAI';
 
+const getCurrencySymbol = (currency) => {
+  if (currency === 'USD') return '$';
+  if (currency === 'EUR') return 'EUR ';
+  if (currency === 'GBP') return 'GBP ';
+  return 'Rs. ';
+};
+
+const getMacroTotals = (meals = []) => meals.reduce(
+  (totals, meal) => ({
+    protein: totals.protein + (Number(meal.macros?.protein) || 0),
+    carbs: totals.carbs + (Number(meal.macros?.carbs) || 0),
+    fat: totals.fat + (Number(meal.macros?.fat) || 0),
+  }),
+  { protein: 0, carbs: 0, fat: 0 },
+);
+
 const Diet = () => {
-    const [dietPlan, setDietPlan] = useState(null)
-    const [loading, setLoading] = useState(true)
-    const [error, setError] = useState(null)
-    const [healthInfo, setHealthInfo] = useState(null)
-    const [chatOpen, setChatOpen] = useState(false)
-    const userData = useSelector((state) => state.auth.userData)
-    const [refreshKey, setRefreshKey] = useState(0);
+  const [dietPlan, setDietPlan] = useState(null);
+  const [healthInfo, setHealthInfo] = useState(null);
+  const [activeDayIndex, setActiveDayIndex] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [chatOpen, setChatOpen] = useState(false);
+  const userData = useSelector((state) => state.auth.userData);
 
-const handlePlanUpdate = (updatedPlan) => {
-        setDietPlan(updatedPlan); // update immediately
-        setRefreshKey(prev => prev + 1); // trigger useEffect if you want to re-fetch
+  useEffect(() => {
+    let cancelled = false;
+
+    const loadDashboard = async () => {
+      setLoading(true);
+      setError('');
+
+      try {
+        const [planResponse, healthResponse] = await Promise.all([
+          axios.get(`${import.meta.env.VITE_API_URL}/api/v2/diet/generate`, {
+            withCredentials: true,
+          }),
+          axios.get(`${import.meta.env.VITE_API_URL}/api/v2/users/userHealth`, {
+            withCredentials: true,
+          }),
+        ]);
+
+        if (cancelled) return;
+        setDietPlan(planResponse.data.data.newPlan);
+        setHealthInfo(healthResponse.data.data.healthUser?.[0] || null);
+        setActiveDayIndex(0);
+      } catch (requestError) {
+        if (cancelled) return;
+        setError(requestError.response?.data?.error || 'We could not load your weekly diet plan.');
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
     };
 
-    const fetchDietPlan = async () => {
-        setLoading(true)
-        setError(null)
-        try {
-            const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/v2/diet/generate`,  {
-                withCredentials: true,
-            });
-            setDietPlan(response.data.data.newPlan)
-        } catch (error) {
-            setError('Error fetching diet plan')
-            setDietPlan(null)
-        } finally {
-            setLoading(false)
-        }
+    loadDashboard();
+    document.title = 'Weekly Diet Plan';
+
+    return () => {
+      cancelled = true;
     };
+  }, []);
 
-    const fetchHealthInfo = async () => {
-        try {
-            const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/v2/users/userHealth`, { withCredentials: true })
-            if (response.data.success) {
-                setHealthInfo(response.data.data.healthUser[0])
-            }
-        } catch (error) {
-            setHealthInfo(null)
-        }
-    }
+  const handlePlanUpdate = (updatedPlan) => {
+    setDietPlan(updatedPlan);
+    setActiveDayIndex(0);
+  };
 
-    useEffect(() => {
-        fetchDietPlan();
-        fetchHealthInfo();
-        document.title = 'Diet Plan'
-    }, [refreshKey])
+  const days = dietPlan?.days || [];
+  const activeDay = days[activeDayIndex];
+  const macros = getMacroTotals(activeDay?.meals);
+  const currency = dietPlan?.currency || userData?.currency || 'INR';
+  const currencySymbol = getCurrencySymbol(currency);
 
-    // Determine currency symbol
-    const currency = dietPlan?.currency || 'INR';
-    const currencySymbol = currency === 'USD' ? '$' : '₹';
+  const selectPreviousDay = () => {
+    setActiveDayIndex((current) => Math.max(0, current - 1));
+  };
 
-    return (
-        <div className="min-h-screen bg-gradient-to-br from-green-100 via-white to-green-200 dark:from-gray-900 dark:via-gray-950 dark:to-gray-900 pt-32 pb-10 px-2 md:px-4 relative overflow-x-hidden">
-            {/* Glassy header (not fixed) */}
-            <div className="z-20 bg-white/60 dark:bg-gray-900/80 backdrop-blur-lg shadow-xl rounded-2xl px-8 py-4 flex flex-col items-center gap-2 border border-green-200 dark:border-gray-800 animate-fade-in-down mb-8">
-                <h1 className="text-4xl font-extrabold text-green-700 dark:text-lime-300 flex items-center gap-3 drop-shadow-lg tracking-tight animate-bounce-slow">
-                    <FaLeaf className="text-green-500 dark:text-lime-400 animate-spin-slow" /> Diet Plan
-                </h1>
-                <span className="inline-flex items-center gap-2 px-4 py-1 rounded-full bg-green-100 dark:bg-gray-800 text-green-700 dark:text-lime-300 font-semibold text-base animate-fade-in">
-                    <FaMoneyBillWave className="text-green-500 dark:text-lime-400 animate-wiggle" />
-                    Currency: {currencySymbol} ({currency})
-                </span>
+  const selectNextDay = () => {
+    setActiveDayIndex((current) => Math.min(days.length - 1, current + 1));
+  };
+
+  return (
+    <main className="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-lime-50 px-4 pb-16 pt-28 dark:from-gray-950 dark:via-gray-900 dark:to-emerald-950/30 sm:px-6">
+      <div className="mx-auto max-w-6xl">
+        <header className="mb-8 overflow-hidden rounded-3xl border border-emerald-100 bg-white/90 p-6 shadow-xl shadow-emerald-100/50 backdrop-blur dark:border-gray-800 dark:bg-gray-900/90 dark:shadow-none sm:p-8">
+          <div className="flex flex-col justify-between gap-6 lg:flex-row lg:items-center">
+            <div>
+              <span className="mb-3 inline-flex items-center gap-2 rounded-full bg-emerald-100 px-3 py-1 text-sm font-semibold text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300">
+                <FaLeaf aria-hidden="true" /> AI-powered weekly nutrition
+              </span>
+              <h1 className="text-3xl font-black tracking-tight text-gray-900 dark:text-white sm:text-4xl">
+                Your 7-Day Diet Plan
+              </h1>
+              <p className="mt-2 max-w-2xl text-gray-600 dark:text-gray-300">
+                A complete week of meals shaped around your goals, preferences, and budget.
+              </p>
             </div>
-            <div className="max-w-3xl mx-auto bg-white/60 dark:bg-gray-900/80 backdrop-blur-lg shadow-2xl rounded-3xl p-8 border border-green-100 dark:border-gray-800 animate-fade-in-up">
-                <p className='text-gray-600 dark:text-gray-300 mb-8 text-center text-lg font-medium'>Your personalized, budget-friendly meal plan powered by AI.</p>
-                {loading && <div className="text-blue-500 dark:text-blue-300 text-center text-lg animate-pulse">Loading...</div>}
-                {error && <div className="text-red-500 dark:text-red-400 text-center text-lg animate-shake">{error}</div>}
-                {dietPlan && (
-                    <div className='mt-4'>
-                        <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8 gap-4">
-                            <h2 className='text-2xl font-bold text-green-700 dark:text-lime-300 flex items-center gap-2 animate-fade-in-left'>
-                                <FaUtensils className="text-green-400 dark:text-lime-400 animate-pop" /> Your Diet Plan
-                            </h2>
-                            <div className="bg-green-50/80 dark:bg-gray-800 border border-green-200 dark:border-gray-700 rounded-xl px-4 py-2 flex items-center gap-2 text-green-700 dark:text-lime-300 font-bold text-lg shadow-sm animate-fade-in-right">
-                                <FaFireAlt className="text-orange-400 dark:text-yellow-400 animate-flicker" />
-                                Total Calories: <span className="ml-1">{dietPlan.totalCalories}</span>
-                            </div>
-                        </div>
-                        <div>
-                            <h3 className="font-semibold text-lg mb-4 text-gray-700 dark:text-gray-200 animate-fade-in">Meals</h3>
-                            <div className="relative pl-8">
-                                {dietPlan.meals && dietPlan.meals.map((meal, idx) => (
-                                    <div key={idx} className="relative flex items-start mb-12 last:mb-0 group">
-                                        {idx !== dietPlan.meals.length - 1 && (
-                                            <span className="absolute left-4 top-8 w-1 h-[calc(100%-2.5rem)] bg-gradient-to-b from-green-300 to-green-100 dark:from-lime-700 dark:to-gray-800 rounded-full z-0"></span>
-                                        )}
-                                        <span className="absolute left-0 top-6 z-10 flex items-center justify-center w-8 h-8 bg-white dark:bg-gray-900 border-4 border-green-400 dark:border-lime-400 rounded-full shadow animate-pop-in">
-                                            <FaCircle className="text-green-400 dark:text-lime-400 animate-pulse text-lg" />
-                                        </span>
-                                        <div className="ml-12 w-full bg-white/80 dark:bg-gray-900/80 backdrop-blur-lg border border-green-200 dark:border-gray-800 rounded-2xl shadow-xl p-6 flex flex-col gap-4 hover:scale-[1.02] hover:shadow-2xl transition-all duration-300 ease-out group cursor-pointer animate-pop-in">
-                                            <div className="flex items-center gap-2 mb-1">
-                                                <span className="inline-block px-3 py-1 rounded-full bg-gradient-to-r from-green-200 to-green-100 dark:from-lime-700 dark:to-gray-800 text-green-800 dark:text-lime-300 text-xs font-bold uppercase tracking-wide shadow group-hover:scale-105 group-hover:bg-green-300 dark:group-hover:bg-lime-800 transition-transform">
-                                                    {meal.mealType}
-                                                </span>
-                                                <span className="font-bold text-lg text-green-700 dark:text-lime-300 group-hover:text-green-900 dark:group-hover:text-lime-200 transition-colors duration-200">{meal.name}</span>
-                                            </div>
-                                            <div className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-200 mb-1">
-                                                <FaBalanceScale className="text-green-500 dark:text-lime-400 animate-bounce-x" />
-                                                <span className="font-semibold">Quantity:</span> {meal.quantity || <span className="italic text-gray-400">N/A</span>}
-                                            </div>
-                                            <div className="flex flex-wrap items-center gap-2 text-sm">
-                                                <span className="bg-orange-100 dark:bg-yellow-900 text-orange-700 dark:text-yellow-300 px-2 py-1 rounded font-semibold flex items-center gap-1 animate-flicker">
-                                                    <FaFireAlt className="inline-block" /> {meal.calories} kcal
-                                                </span>
-                                                <span className="bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 px-2 py-1 rounded font-semibold animate-pop-in">
-                                                    Protein: {meal.macros?.protein}g
-                                                </span>
-                                                <span className="bg-yellow-100 dark:bg-yellow-900 text-yellow-700 dark:text-yellow-300 px-2 py-1 rounded font-semibold animate-pop-in">
-                                                    Carbs: {meal.macros?.carbs}g
-                                                </span>
-                                                <span className="bg-pink-100 dark:bg-pink-900 text-pink-700 dark:text-pink-300 px-2 py-1 rounded font-semibold animate-pop-in">
-                                                    Fat: {meal.macros?.fat}g
-                                                </span>
-                                                {typeof meal.estimatedCost === 'number' && (
-                                                    <span className="bg-green-200 dark:bg-lime-900 text-green-800 dark:text-lime-300 px-2 py-1 rounded font-semibold flex items-center gap-1 animate-wiggle">
-                                                        <FaMoneyBillWave className="inline-block" />
-                                                        {currencySymbol}{meal.estimatedCost}
-                                                    </span>
-                                                )}
-                                            </div>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-                    </div>
-                )}
-                {!loading && !dietPlan && !error && (
-                    <div className="text-gray-600 dark:text-gray-300 mt-4 text-center animate-fade-in">No diet plan available.</div>
-                )}
-            </div>
-          
-            <button
-                className="fixed bottom-8 right-8 z-50 bg-green-500 dark:bg-lime-700 hover:bg-green-600 dark:hover:bg-lime-600 text-white rounded-full shadow-lg w-16 h-16 flex items-center justify-center text-3xl transition-all duration-200"
-                onClick={() => setChatOpen(true)}
-                aria-label="Open AI Chat"
-            >
-                <FaRobot />
-            </button>
-            {/* Chat Modal */}
-            {chatOpen && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 dark:bg-black/70">
-                    <div className="relative w-full max-w-lg mx-auto bg-white/90 dark:bg-gray-900/90 rounded-2xl shadow-2xl p-0 md:p-4 animate-fade-in-up">
-                        <button
-                            className="absolute top-2 right-2 text-green-600 dark:text-lime-400 hover:text-green-800 dark:hover:text-lime-200 text-2xl p-2 rounded-full focus:outline-none"
-                            onClick={() => setChatOpen(false)}
-                            aria-label="Close Chat"
-                        >
-                            <FaTimes />
-                        </button>
-                        <ChatWithAI userData={userData} dietPlane={dietPlan} healthInfo={healthInfo} onPlanUpdate={handlePlanUpdate} />
-                    </div>
+
+            {dietPlan && (
+              <div className="grid grid-cols-2 gap-3 sm:min-w-80">
+                <div className="rounded-2xl bg-orange-50 p-4 dark:bg-orange-950/30">
+                  <p className="text-xs font-bold uppercase tracking-wide text-orange-600 dark:text-orange-300">Daily average</p>
+                  <p className="mt-1 text-2xl font-black text-gray-900 dark:text-white">
+                    {dietPlan.averageDailyCalories || Math.round(dietPlan.totalCalories / 7)}
+                    <span className="ml-1 text-sm font-semibold text-gray-500">kcal</span>
+                  </p>
                 </div>
+                <div className="rounded-2xl bg-emerald-50 p-4 dark:bg-emerald-950/30">
+                  <p className="text-xs font-bold uppercase tracking-wide text-emerald-600 dark:text-emerald-300">Currency</p>
+                  <p className="mt-1 text-2xl font-black text-gray-900 dark:text-white">{currency}</p>
+                </div>
+              </div>
             )}
-        </div>
-    )
-}
+          </div>
+        </header>
 
-export default Diet
+        {loading && (
+          <div className="rounded-3xl border border-emerald-100 bg-white p-10 text-center shadow-lg dark:border-gray-800 dark:bg-gray-900" role="status">
+            <div className="mx-auto mb-4 h-12 w-12 animate-spin rounded-full border-4 border-emerald-100 border-t-emerald-500" />
+            <p className="font-semibold text-gray-700 dark:text-gray-200">Preparing your full week of meals...</p>
+            <p className="mt-1 text-sm text-gray-500">The first weekly plan may take a little longer to generate.</p>
+          </div>
+        )}
+
+        {!loading && error && (
+          <div className="rounded-2xl border border-red-200 bg-red-50 p-6 text-center text-red-700 dark:border-red-900 dark:bg-red-950/30 dark:text-red-300" role="alert">
+            <p className="font-bold">Your plan could not be loaded</p>
+            <p className="mt-1 text-sm">{error}</p>
+          </div>
+        )}
+
+        {!loading && !error && !activeDay && (
+          <div className="rounded-3xl border border-emerald-100 bg-white p-10 text-center shadow-lg dark:border-gray-800 dark:bg-gray-900">
+            <FaUtensils className="mx-auto mb-4 text-4xl text-emerald-500" aria-hidden="true" />
+            <h2 className="text-xl font-black text-gray-900 dark:text-white">No weekly plan is available yet</h2>
+            <p className="mt-2 text-gray-500 dark:text-gray-400">Update your profile and health details, then return here to generate your plan.</p>
+          </div>
+        )}
+
+        {!loading && !error && activeDay && (
+          <section aria-labelledby="daily-plan-heading">
+            <nav className="mb-6 rounded-2xl border border-emerald-100 bg-white p-2 shadow-md dark:border-gray-800 dark:bg-gray-900" aria-label="Choose a day">
+              <div className="flex gap-2 overflow-x-auto pb-1 sm:grid sm:grid-cols-7 sm:overflow-visible sm:pb-0">
+                {days.map((day, index) => (
+                  <button
+                    key={day._id || day.dayNumber}
+                    type="button"
+                    onClick={() => setActiveDayIndex(index)}
+                    className={`min-w-24 rounded-xl px-4 py-3 text-left transition sm:min-w-0 sm:text-center ${
+                      activeDayIndex === index
+                        ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-200 dark:shadow-none'
+                        : 'text-gray-600 hover:bg-emerald-50 dark:text-gray-300 dark:hover:bg-gray-800'
+                    }`}
+                    aria-current={activeDayIndex === index ? 'page' : undefined}
+                  >
+                    <span className="block text-xs font-semibold uppercase tracking-wide opacity-80">Day</span>
+                    <span className="text-lg font-black">{day.dayNumber || index + 1}</span>
+                  </button>
+                ))}
+              </div>
+            </nav>
+
+            <div className="mb-6 rounded-3xl border border-emerald-100 bg-white p-5 shadow-lg dark:border-gray-800 dark:bg-gray-900 sm:p-7">
+              <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
+                <div className="flex items-center justify-between gap-4">
+                  <button type="button" onClick={selectPreviousDay} disabled={activeDayIndex === 0} className="rounded-full border border-gray-200 p-3 text-gray-600 transition hover:border-emerald-300 hover:text-emerald-600 disabled:cursor-not-allowed disabled:opacity-30 dark:border-gray-700 dark:text-gray-300" aria-label="Previous day">
+                    <FaChevronLeft aria-hidden="true" />
+                  </button>
+                  <div className="text-center lg:text-left">
+                    <p className="text-sm font-bold uppercase tracking-widest text-emerald-600 dark:text-emerald-400">Today&apos;s menu</p>
+                    <h2 id="daily-plan-heading" className="text-2xl font-black text-gray-900 dark:text-white">{activeDay.label || `Day ${activeDayIndex + 1}`}</h2>
+                  </div>
+                  <button type="button" onClick={selectNextDay} disabled={activeDayIndex === days.length - 1} className="rounded-full border border-gray-200 p-3 text-gray-600 transition hover:border-emerald-300 hover:text-emerald-600 disabled:cursor-not-allowed disabled:opacity-30 dark:border-gray-700 dark:text-gray-300 lg:hidden" aria-label="Next day">
+                    <FaChevronRight aria-hidden="true" />
+                  </button>
+                </div>
+
+                <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+                  <div className="rounded-xl bg-orange-50 px-4 py-3 dark:bg-orange-950/30">
+                    <span className="flex items-center gap-1 text-xs font-bold text-orange-600 dark:text-orange-300"><FaFireAlt /> Calories</span>
+                    <strong className="text-lg text-gray-900 dark:text-white">{activeDay.totalCalories}</strong>
+                  </div>
+                  <div className="rounded-xl bg-blue-50 px-4 py-3 dark:bg-blue-950/30"><span className="text-xs font-bold text-blue-600 dark:text-blue-300">Protein</span><strong className="block text-lg text-gray-900 dark:text-white">{macros.protein}g</strong></div>
+                  <div className="rounded-xl bg-amber-50 px-4 py-3 dark:bg-amber-950/30"><span className="text-xs font-bold text-amber-600 dark:text-amber-300">Carbs</span><strong className="block text-lg text-gray-900 dark:text-white">{macros.carbs}g</strong></div>
+                  <div className="rounded-xl bg-rose-50 px-4 py-3 dark:bg-rose-950/30"><span className="text-xs font-bold text-rose-600 dark:text-rose-300">Fat</span><strong className="block text-lg text-gray-900 dark:text-white">{macros.fat}g</strong></div>
+                </div>
+
+                <button type="button" onClick={selectNextDay} disabled={activeDayIndex === days.length - 1} className="hidden rounded-full border border-gray-200 p-3 text-gray-600 transition hover:border-emerald-300 hover:text-emerald-600 disabled:cursor-not-allowed disabled:opacity-30 dark:border-gray-700 dark:text-gray-300 lg:block" aria-label="Next day">
+                  <FaChevronRight aria-hidden="true" />
+                </button>
+              </div>
+            </div>
+
+            <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+              {activeDay.meals.map((meal) => (
+                <article key={meal._id || `${activeDay.dayNumber}-${meal.mealType}`} className="group rounded-2xl border border-gray-100 bg-white p-5 shadow-md transition hover:-translate-y-1 hover:border-emerald-200 hover:shadow-xl dark:border-gray-800 dark:bg-gray-900 dark:hover:border-emerald-800">
+                  <div className="mb-4 flex items-start justify-between gap-3">
+                    <div>
+                      <span className="inline-flex items-center gap-2 rounded-full bg-emerald-100 px-3 py-1 text-xs font-bold uppercase tracking-wide text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300">
+                        <FaUtensils aria-hidden="true" /> {meal.mealType}
+                      </span>
+                      <h3 className="mt-3 text-xl font-black text-gray-900 dark:text-white">{meal.name}</h3>
+                    </div>
+                    <span className="shrink-0 rounded-xl bg-orange-50 px-3 py-2 text-sm font-bold text-orange-600 dark:bg-orange-950/30 dark:text-orange-300">{meal.calories} kcal</span>
+                  </div>
+
+                  <p className="mb-4 flex items-start gap-2 text-sm leading-6 text-gray-600 dark:text-gray-300">
+                    <FaBalanceScale className="mt-1 shrink-0 text-emerald-500" aria-hidden="true" />
+                    <span>{meal.quantity || 'Quantity not specified'}</span>
+                  </p>
+
+                  <div className="grid grid-cols-3 gap-2 border-t border-gray-100 pt-4 text-center dark:border-gray-800">
+                    <div><span className="block text-xs text-gray-500">Protein</span><strong className="text-sm text-blue-600 dark:text-blue-300">{meal.macros?.protein || 0}g</strong></div>
+                    <div><span className="block text-xs text-gray-500">Carbs</span><strong className="text-sm text-amber-600 dark:text-amber-300">{meal.macros?.carbs || 0}g</strong></div>
+                    <div><span className="block text-xs text-gray-500">Fat</span><strong className="text-sm text-rose-600 dark:text-rose-300">{meal.macros?.fat || 0}g</strong></div>
+                  </div>
+
+                  {typeof meal.estimatedCost === 'number' && (
+                    <div className="mt-4 flex items-center justify-between rounded-xl bg-gray-50 px-3 py-2 text-sm dark:bg-gray-800">
+                      <span className="flex items-center gap-2 text-gray-500 dark:text-gray-400"><FaMoneyBillWave className="text-emerald-500" /> Estimated cost</span>
+                      <strong className="text-gray-900 dark:text-white">{currencySymbol}{meal.estimatedCost}</strong>
+                    </div>
+                  )}
+                </article>
+              ))}
+            </div>
+          </section>
+        )}
+      </div>
+
+      {dietPlan && healthInfo && (
+        <button type="button" className="fixed bottom-6 right-6 z-40 flex items-center gap-2 rounded-full bg-emerald-600 px-5 py-4 font-bold text-white shadow-xl transition hover:bg-emerald-700 focus:outline-none focus:ring-4 focus:ring-emerald-200 dark:focus:ring-emerald-900" onClick={() => setChatOpen(true)} aria-label="Open diet assistant">
+          <FaRobot className="text-xl" aria-hidden="true" />
+          <span className="hidden sm:inline">Ask AI</span>
+        </button>
+      )}
+
+      {chatOpen && (
+        <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/50 p-0 backdrop-blur-sm sm:items-center sm:p-4" role="dialog" aria-modal="true" aria-label="AI diet assistant">
+          <div className="relative w-full max-w-2xl rounded-t-3xl bg-white p-4 shadow-2xl dark:bg-gray-900 sm:rounded-3xl sm:p-6">
+            <button type="button" className="absolute right-3 top-3 z-10 rounded-full p-2 text-gray-500 transition hover:bg-gray-100 hover:text-gray-900 dark:hover:bg-gray-800 dark:hover:text-white" onClick={() => setChatOpen(false)} aria-label="Close diet assistant">
+              <FaTimes className="text-xl" aria-hidden="true" />
+            </button>
+            <ChatWithAI userData={userData} dietPlane={dietPlan} healthInfo={healthInfo} onPlanUpdate={handlePlanUpdate} />
+          </div>
+        </div>
+      )}
+    </main>
+  );
+};
+
+export default Diet;
