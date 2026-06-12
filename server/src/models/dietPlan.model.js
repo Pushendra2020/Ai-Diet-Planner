@@ -34,6 +34,24 @@ const mealSchema = new Schema({
   },
 });
 
+const daySchema = new Schema({
+  dayNumber: {
+    type: Number,
+    required: true,
+    min: 1,
+    max: 7,
+  },
+  label: {
+    type: String,
+    required: true,
+  },
+  totalCalories: Number,
+  meals: {
+    type: [mealSchema],
+    default: [],
+  },
+});
+
 const dietPlanSchema = new Schema(
   {
     userId: {
@@ -41,8 +59,19 @@ const dietPlanSchema = new Schema(
       ref: "User",
     },
     totalCalories: Number,
+    averageDailyCalories: Number,
+    currency: {
+      type: String,
+      default: "INR",
+    },
+    days: {
+      type: [daySchema],
+      default: [],
+    },
+    // Kept for compatibility with plans generated before weekly plans.
     meals: {
       type: [mealSchema],
+      default: [],
     },
     source: {
       type: String,

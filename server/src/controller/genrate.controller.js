@@ -6,18 +6,50 @@ import ApiResponse from "../utils/ApiResponse.js";
 import { ApiError } from "../utils/ApiError.js"
 
 
-const callGemini = async (prompt) => {
-  const response = await axios.post(
-    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${process.env.GEMINI_API_KEY}`,
-    {
-      contents: [{ parts: [{ text: prompt }] }],
-    },
-    {
-      headers: { "Content-Type": "application/json" },
+const callAI = async (prompt) => {
+  const apiKey = process.env.OPENAI_API_KEY || process.env.NVIDIA_API_KEY;
+  const baseUrl = (process.env.OPENAI_BASE_URL || "https://integrate.api.nvidia.com/v1")
+    .replace(/\/$/, "");
+  const model = process.env.OPENAI_MODEL;
+
+  if (!apiKey) {
+    throw new ApiError(500, "OPENAI_API_KEY or NVIDIA_API_KEY is not configured.");
+  }
+
+  if (!model) {
+    throw new ApiError(500, "OPENAI_MODEL is not configured.");
+  }
+
+  try {
+    const response = await axios.post(
+      `${baseUrl}/chat/completions`,
+      {
+        model,
+        messages: [{ role: "user", content: prompt }],
+        temperature: 0.4,
+        max_tokens: Number(process.env.OPENAI_MAX_TOKENS) || 8192,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${apiKey}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    const content = response.data?.choices?.[0]?.message?.content;
+    if (!content) {
+      throw new Error("The AI provider returned an empty response.");
     }
-  );
-  const data = response.data;
-  return data?.candidates?.[0]?.content?.parts?.[0]?.text || "";
+
+    return content;
+  } catch (error) {
+    const providerMessage = error.response?.data?.error?.message;
+    throw new ApiError(
+      error.response?.status || 500,
+      providerMessage || error.message || "AI provider request failed."
+    );
+  }
 };
 
 const createDietPrompt = (user, health) => {
@@ -27,7 +59,7 @@ const createDietPrompt = (user, health) => {
     : 'not specified';
 
   return `
-Create a personalized diet plan for the following user:
+Create a personalized 7-day diet plan for the following user:
 - Name: ${user.username}
 - Age: ${user.age}
 - Gender: ${user.gender}
@@ -42,7 +74,10 @@ Create a personalized diet plan for the following user:
 - Money budget for each meal (in ${user.currency}): ${budgets}
 
 **Instructions:**
-- Distribute the total daily calories across ${mealCount} meals.
+- Return exactly 7 days, numbered 1 through 7.
+- Give every day ${mealCount} meals and vary the dishes across the week.
+- Keep each day's total close to ${health.calorieNeed} calories.
+- Distribute each day's calories across ${mealCount} meals.
 - For each meal, provide only:
   - The dish name (e.g., \"Paneer Curry\")
   - The quantity (e.g., \"2 chapati + 1 bowl curry\")
@@ -50,19 +85,64 @@ Create a personalized diet plan for the following user:
   - Macros (protein, carbs, fat)
   - Estimated cost (optional)
 - Do NOT include an ingredients list.
-- Name the meals as \"Meal 1\", \"Meal 2\", etc.
-- Return the result in this JSON format:
+- Name meals as \"Meal 1\", \"Meal 2\", etc.
+- Return only a valid JSON array with no markdown or commentary.
+- Use this exact structure:
 [
   {
-    \"mealType\": \"Meal 1\",
-    \"name\": \"Paneer Curry\",
-    \"quantity\": \"2 chapati + 1 bowl curry\",
-    \"calories\": 350,
-    \"macros\": { \"protein\": 12, \"carbs\": 60, \"fat\": 8 },
-    \"estimatedCost\": 50
+    \"dayNumber\": 1,
+    \"label\": \"Day 1\",
+    \"meals\": [
+      {
+        \"mealType\": \"Meal 1\",
+        \"name\": \"Paneer Curry\",
+        \"quantity\": \"2 chapati + 1 bowl curry\",
+        \"calories\": 350,
+        \"macros\": { \"protein\": 12, \"carbs\": 60, \"fat\": 8 },
+        \"estimatedCost\": 50
+      }
+    ]
   }
 ]
 `;
+};
+
+const parseJsonArray = (value) => {
+  const match = value.match(/\[.*\]/s);
+  if (!match) throw new Error("No JSON array found in AI response.");
+  return JSON.parse(match[0]);
+};
+
+const normalizeDays = (days) => {
+  if (!Array.isArray(days) || days.length !== 7) {
+    throw new Error("AI response must contain exactly 7 days.");
+  }
+
+  return days.map((day, dayIndex) => {
+    if (!Array.isArray(day.meals) || day.meals.length === 0) {
+      throw new Error(`Day ${dayIndex + 1} does not contain any meals.`);
+    }
+
+    const meals = day.meals.map((meal, mealIndex) => ({
+      ...meal,
+      mealType: `Meal ${mealIndex + 1}`,
+    }));
+
+    return {
+      dayNumber: dayIndex + 1,
+      label: `Day ${dayIndex + 1}`,
+      meals,
+      totalCalories: meals.reduce((sum, meal) => sum + (Number(meal.calories) || 0), 0),
+    };
+  });
+};
+
+const getWeeklyTotals = (days) => {
+  const totalCalories = days.reduce((sum, day) => sum + day.totalCalories, 0);
+  return {
+    totalCalories,
+    averageDailyCalories: Math.round(totalCalories / days.length),
+  };
 };
 
 const generateDietPlanAI = async (req, res) => {
@@ -72,7 +152,7 @@ const generateDietPlanAI = async (req, res) => {
 
     // Check if a diet plan already exists for this user
     const existingPlan = await dietPlan.findOne({ userId: user._id });
-    if (existingPlan) {
+    if (existingPlan?.days?.length === 7) {
       return res.status(200).json(new ApiResponse(200, { newPlan: existingPlan }, "Existing diet plan found"));
     }
 
@@ -82,13 +162,11 @@ const generateDietPlanAI = async (req, res) => {
     }
 
     const prompt = createDietPrompt(user, health);
-    const result = await callGemini(prompt);
-    let parsedMeals;
+    const result = await callAI(prompt);
+    let days;
 
     try {
-      const match = result.match(/\[.*\]/s);
-      if (!match) throw new Error("No JSON array found in AI response.");
-      parsedMeals = JSON.parse(match[0]);
+      days = normalizeDays(parseJsonArray(result));
     } catch (e) {
       return res.status(500).json({
         error: "AI response could not be parsed.",
@@ -97,23 +175,17 @@ const generateDietPlanAI = async (req, res) => {
       });
     }
 
-    // Rename all mealTypes to 'Meal 1', 'Meal 2', etc.
-    parsedMeals = parsedMeals.map((meal, idx) => ({
-      ...meal,
-      mealType: `Meal ${idx + 1}`
-    }));
-
-    const totalCalories = parsedMeals.reduce(
-      (sum, m) => sum + (m.calories || 0),
-      0
-    );
-
-    const newPlan = await dietPlan.create({
+    const planData = {
       userId: user._id,
-      meals: parsedMeals,
-      totalCalories,
+      days,
+      meals: [],
+      currency: user.currency || "INR",
+      ...getWeeklyTotals(days),
       source: "ai",
-    });
+    };
+    const newPlan = existingPlan
+      ? await dietPlan.findByIdAndUpdate(existingPlan._id, { $set: planData }, { new: true })
+      : await dietPlan.create(planData);
     return res
       .status(200)
       .json(new ApiResponse(200, { newPlan }, "Generated new diet plan"));
@@ -133,8 +205,8 @@ export const askDietAI = async (req, res) => {
     const prompt = `You are a helpful AI diet assistant.\n\nUser Info:\nName: ${user.username}\nAge: ${user.age}\nGender: ${user.gender}\nHeight: ${user.height}cm\n
     Weight: ${user.weight}kg\nGoal: ${user.goal}\nActivity Level: ${user.activityLevel}\nDietary Preferences: ${user.dietPreferences}\nAllergies: ${user.allergies?.join(', ') || 'None'}
     \nMeals Per Day: ${user.mealsPerDay}\nMeal Budgets: ${(user.mealBudgets || []).join(', ')}\nCurrency: ${user.currency || 'INR'}\n\nHealth Info:\nBMI: ${healthInfo.bmi}\nBMR: ${healthInfo.bmr}\nTDEE: ${healthInfo.tdee}
-    \nCalorie Need: ${healthInfo.calorieNeed}\n\nDiet Plan:\nTotal Calories: ${dietPlane.totalCalories}\nMeals: ${dietPlane.meals.map((m, i) => `Meal ${i + 1}: ${m.name} (${m.quantity || 'N/A'}, ${m.calories} kcal, Protein: ${m.macros?.protein}g, Carbs: ${m.macros?.carbs}g, Fat: ${m.macros?.fat}g)`).join('\n')}\n\nUser Question: ${question}\n\nAnswer the user in a friendly, helpful, and concise way.`;
-    const aiAnswer = await callGemini(prompt);
+    \nCalorie Need: ${healthInfo.calorieNeed}\n\n7-Day Diet Plan:\n${JSON.stringify(dietPlane.days || [], null, 2)}\n\nUser Question: ${question}\n\nAnswer the user in a friendly, helpful, and concise way.`;
+    const aiAnswer = await callAI(prompt);
     return res.json({ answer: aiAnswer });
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -147,25 +219,20 @@ export const changeDietPlanAI = async (req, res) => {
     if (!changeRequest || !user || !dietPlane || !healthInfo) {
       return res.status(400).json({ error: 'Missing required data.' });
     }
-    // Build prompt for Gemini
-    const prompt = `You are an expert AI dietitian. Here is the user's current diet plan and their request to change it. 
-    Please return the updated plan in the same JSON format as before.\n\nUser Info:\nName: ${user.username}\nAge: ${user.age}\nGender: ${user.gender}\nHeight: ${user.height}cm\nWeight: ${user.weight}kg\nGoal: ${user.goal}\nActivity Level: ${user.activityLevel}\nDietary Preferences: ${user.dietPreferences}\nAllergies: ${user.allergies?.join(', ') || 'None'}\nMeals Per Day: ${user.mealsPerDay}\nMeal Budgets: ${(user.mealBudgets || []).join(', ')}\nCurrency: ${user.currency || 'INR'}\n\nHealth Info:\nBMI: ${healthInfo.bmi}\nBMR: ${healthInfo.bmr}\nTDEE: ${healthInfo.tdee}\nCalorie Need: ${healthInfo.calorieNeed}\n\nCurrent Diet Plan:\nTotal Calories: ${dietPlane.totalCalories}\nMeals: ${JSON.stringify(dietPlane.meals, null, 2)}\n\nUser Request: ${changeRequest}\n\n**Instructions:**\n- Only make the requested change.\n- Return the full updated plan as a JSON array of meals, same format as before. ONLY return the JSON array, nothing else.`;
-    const aiResult = await callGemini(prompt);
+    // Build prompt for the configured AI provider
+    const prompt = `You are an expert AI dietitian. Update the user's 7-day diet plan based on their request.\n\nUser Info:\nName: ${user.username}\nAge: ${user.age}\nGender: ${user.gender}\nHeight: ${user.height}cm\nWeight: ${user.weight}kg\nGoal: ${user.goal}\nActivity Level: ${user.activityLevel}\nDietary Preferences: ${user.dietPreferences}\nAllergies: ${user.allergies?.join(', ') || 'None'}\nMeals Per Day: ${user.mealsPerDay}\nMeal Budgets: ${(user.mealBudgets || []).join(', ')}\nCurrency: ${user.currency || 'INR'}\n\nHealth Info:\nBMI: ${healthInfo.bmi}\nBMR: ${healthInfo.bmr}\nTDEE: ${healthInfo.tdee}\nCalorie Need: ${healthInfo.calorieNeed}\n\nCurrent 7-Day Diet Plan:\n${JSON.stringify(dietPlane.days || [], null, 2)}\n\nUser Request: ${changeRequest}\n\n**Instructions:**\n- Only make the requested change.\n- Preserve all 7 days and all unaffected meals.\n- Return exactly 7 days using the same day and meal JSON structure.\n- Return only the JSON array with no markdown or commentary.`;
+    const aiResult = await callAI(prompt);
     console.log('AI raw response:', aiResult);
     console.log('user._id:', user._id);
     console.log('dietPlane:', dietPlane);
-    let updatedMeals;
+    let updatedDays;
     try {
-      const match = aiResult.match(/\[.*\]/s);
-      if (!match) throw new Error('No JSON array found in AI response.');
-      updatedMeals = JSON.parse(match[0]);
+      updatedDays = normalizeDays(parseJsonArray(aiResult));
     } catch (e) {
       console.error('AI response parse error:', e, aiResult);
       return res.status(500).json({ error: 'AI response could not be parsed.', details: e.message, raw: aiResult });
     }
-    // Rename all mealTypes to 'Meal 1', 'Meal 2', etc.
-    updatedMeals = updatedMeals.map((meal, idx) => ({ ...meal, mealType: `Meal ${idx + 1}` }));
-    const totalCalories = updatedMeals.reduce((sum, m) => sum + (m.calories || 0), 0);
+    const totals = getWeeklyTotals(updatedDays);
     // Update the plan in DB
     let updatedPlan;
 
@@ -174,8 +241,10 @@ export const changeDietPlanAI = async (req, res) => {
          {userId:user._id},
         {
           $set: {
-            meals: updatedMeals,
-            totalCalories,
+            days: updatedDays,
+            meals: [],
+            currency: user.currency || "INR",
+            ...totals,
             source: 'ai'
           }
         },
